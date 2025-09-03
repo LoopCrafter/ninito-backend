@@ -20,8 +20,13 @@ const createCategory = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-const getCategories = (req, res) => {
-  res.json({ message: "categories list" });
+const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.status(200).json({ success: true, categories });
+  } catch (e) {
+    return res.status(500).json({ error: err.message });
+  }
 };
 const categoryDetail = (req, res) => {
   res.json({ message: "categories list" });

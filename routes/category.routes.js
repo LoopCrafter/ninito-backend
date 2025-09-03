@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { createCategory } from "../controllers/category.controllers.js";
+import {
+  createCategory,
+  getCategories,
+} from "../controllers/category.controllers.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
@@ -12,5 +15,6 @@ router.post(
   uploaderManager.single("./uploads/categories", "image"),
   createCategory
 );
+router.get("/all", getCategories);
 
 export default router;
