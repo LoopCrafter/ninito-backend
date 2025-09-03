@@ -4,6 +4,8 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerOptions from "./swaggerOptions.js";
 import authRoutes from "./routes/auth.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -16,8 +18,11 @@ const specs = swaggerJsdoc(swaggerOptions);
 app.get("/", (req, res) => {
   res.send("OK");
 });
+const BASE_PATH = "/api/v1";
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-app.use("/api/v1/auth", authRoutes);
+app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/product`, productRoutes);
+app.use(`${BASE_PATH}/category`, categoryRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

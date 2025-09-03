@@ -37,6 +37,7 @@ const signup = async (req, res) => {
       name,
       verificationToken,
       verificationTokenExpiresAt,
+      role: "user",
     });
     await user.save();
 
@@ -46,6 +47,7 @@ const signup = async (req, res) => {
       user: {
         ...user._doc,
         password: undefined,
+        role: undefined,
       },
     });
   } catch (e) {
@@ -76,14 +78,15 @@ const verifyEmail = async (req, res) => {
     await user.save();
     await sendWelcomeEmail(user.email, user.name, "https://hamed.cloud");
     //jwt
-    const accessToken = generateAccessToken(res, user._id);
-    generateRefreshTokenAndSetCookie(res, user._id);
+    const accessToken = generateAccessToken(res, user._id, user.role);
+    generateRefreshTokenAndSetCookie(res, user._id, user.role);
     res.status(200).json({
       success: true,
       message: "Email Verified Successfully",
       user: {
         ...user._doc,
         password: undefined,
+        role: undefined,
       },
       accessToken,
     });
@@ -108,8 +111,8 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid Credential" });
     }
 
-    const accessToken = generateAccessToken(res, user._id);
-    generateRefreshTokenAndSetCookie(res, user._id);
+    const accessToken = generateAccessToken(res, user._id, user.role);
+    generateRefreshTokenAndSetCookie(res, user._id, user.role);
 
     user.lastLogin = new Date();
     await user.save();
@@ -120,6 +123,7 @@ const login = async (req, res) => {
       user: {
         ...user._doc,
         password: undefined,
+        role: undefined,
       },
       accessToken,
     });
@@ -211,7 +215,11 @@ const refreshAccessToken = async (req, res) => {
       process.env.JWT_REFRESH_SECRET
     );
 
-    const accessToken = generateAccessToken(res, decodedToken.userId);
+    const accessToken = generateAccessToken(
+      res,
+      decodedToken.userId,
+      decodedToken.role
+    );
     res.status(200).json({ message: "Access token refreshed", accessToken });
   } catch (error) {
     res

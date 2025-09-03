@@ -3,15 +3,15 @@ import jwt from "jsonwebtoken";
 export const getExpiryDate = (days = 1) =>
   Date.now() + days * 24 * 60 * 60 * 1000;
 
-export const generateAccessToken = (res, userId) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+export const generateAccessToken = (res, userId, userRole) => {
+  const token = jwt.sign({ userId, userRole }, process.env.JWT_SECRET, {
     expiresIn: "30m",
   });
 
   return token;
 };
-export const generateRefreshTokenAndSetCookie = (res, userId) => {
-  const token = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+export const generateRefreshTokenAndSetCookie = (res, userId, userRole) => {
+  const token = jwt.sign({ userId, userRole }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: "30d",
   });
 

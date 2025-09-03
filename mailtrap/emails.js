@@ -12,7 +12,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
     const response = await mailTrapClient.send({
       from: sender,
       to: recipient,
-      subject: "Verify your Email!",
+      subject: "تأیید ایمیل شما ✔️",
       html: VERIFICATION_EMAIL_TEMPLATE.replace(
         "{verificationCode}",
         verificationToken
@@ -20,10 +20,10 @@ export const sendVerificationEmail = async (email, verificationToken) => {
       category: "Email verification",
     });
 
-    console.log("Email Send successfully", response);
+    console.log("ایمیل تأیید با موفقیت ارسال شد", response);
   } catch (error) {
     console.log(error);
-    throw new Error(`Error sending verificationCode: ${error}`);
+    throw new Error(`خطا در ارسال کد تأیید: ${error}`);
   }
 };
 
@@ -33,7 +33,7 @@ export const sendWelcomeEmail = async (email, username, appUrl) => {
     const response = await mailTrapClient.send({
       from: sender,
       to: recipient,
-      subject: "Welcome to Our App! 🎉",
+      subject: "به نینیتو خوش آمدی 🎉",
       html: WELCOME_EMAIL_TEMPLATE.replace("{username}", username).replace(
         "{appUrl}",
         appUrl
@@ -41,10 +41,10 @@ export const sendWelcomeEmail = async (email, username, appUrl) => {
       category: "Welcome email",
     });
 
-    console.log("Welcome Email sent successfully", response);
+    console.log("ایمیل خوشامدگویی با موفقیت ارسال شد", response);
   } catch (error) {
     console.log(error);
-    throw new Error(`Error sending welcome email: ${error}`);
+    throw new Error(`خطا در ارسال ایمیل خوشامدگویی: ${error}`);
   }
 };
 
@@ -54,31 +54,32 @@ export const sentPasswordResetEmail = async (email, resetUrl) => {
     const response = await mailTrapClient.send({
       from: sender,
       to: recipient,
-      subject: "Reset Your Password!",
+      subject: "بازیابی رمز عبور 🔑",
       html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetUrl),
       category: "Password Reset",
     });
 
-    console.log("Email Send successfully", response);
+    console.log("ایمیل بازیابی رمز عبور با موفقیت ارسال شد", response);
   } catch (error) {
     console.log(error);
-    throw new Error(`Error sending verificationCode: ${error}`);
+    throw new Error(`خطا در ارسال ایمیل بازیابی رمز عبور: ${error}`);
   }
 };
+
 export const SendResetSuccessEmail = async (email) => {
   const recipient = [{ email }];
   try {
     const response = await mailTrapClient.send({
       from: sender,
       to: recipient,
-      subject: "Password Reset Successful",
+      subject: "رمز عبور با موفقیت تغییر کرد ✅",
       html: PASSWORD_RESET_SUCCESS_TEMPLATE,
       category: "Password Reset",
     });
 
-    console.log("success reset Email Send successfully", response);
+    console.log("ایمیل تغییر موفق رمز عبور ارسال شد", response);
   } catch (error) {
     console.log(error);
-    throw new Error(`Error sending verificationCode: ${error}`);
+    throw new Error(`خطا در ارسال ایمیل تغییر رمز عبور: ${error}`);
   }
 };

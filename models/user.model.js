@@ -23,6 +23,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    image: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin", "moderator"],
+      default: "user",
+    },
     resetPasswordToken: String,
     resetPasswordExpiresAt: String,
     verificationToken: String,

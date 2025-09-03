@@ -29,8 +29,10 @@ const requireAuth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
+    req.userRole = decoded.userRole;
     next();
   } catch (error) {
+    console.log(error);
     if (error.name === "TokenExpiredError") {
       return res
         .status(401)
@@ -53,4 +55,12 @@ const requireVerified = (req, res, next) => {
   next();
 };
 
-export { loginLimiter, validate, requireVerified, requireAuth };
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.userRole))
+      return res.status(403).json({ msg: "Access denied" });
+    next();
+  };
+};
+
+export { loginLimiter, validate, requireVerified, requireAuth, authorizeRoles };

@@ -7,5 +7,5 @@ export const mailTrapClient = new MailtrapClient({
 
 export const sender = {
   email: "hello@hamed.cloud",
-  name: "MERN AUTH",
+  name: "فروشگاه Ninito.ir",
 };
