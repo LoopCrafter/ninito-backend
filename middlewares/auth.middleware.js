@@ -19,7 +19,6 @@ const validate = (req, res, next) => {
 const requireAuth = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // "Bearer <token>"
-
   if (!token) {
     return res
       .status(401)
