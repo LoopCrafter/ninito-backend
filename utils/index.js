@@ -1,0 +1,29 @@
+import jwt from "jsonwebtoken";
+
+export const getExpiryDate = (days = 1) =>
+  Date.now() + days * 24 * 60 * 60 * 1000;
+
+export const generateAccessToken = (res, userId) => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: "30m",
+  });
+
+  return token;
+};
+export const generateRefreshTokenAndSetCookie = (res, userId) => {
+  const token = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: "30d",
+  });
+
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    // sameSite: "none",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+};
+
+export const generateVerificationToken = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
