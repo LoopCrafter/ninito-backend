@@ -22,7 +22,11 @@ const createCategory = async (req, res) => {
 };
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    let categories = await Category.find();
+    categories = categories.map((category) => ({
+      ...category,
+      image: process.env.BASEURL + category.image,
+    }));
     res.status(200).json({ success: true, categories });
   } catch (error) {
     return res.status(500).json({ error: error.message });
