@@ -23,11 +23,15 @@ const createCategory = async (req, res) => {
 const getCategories = async (req, res) => {
   try {
     let categories = await Category.find();
-    categories = categories.map((category) => ({
-      ...category,
-      image: process.env.BASEURL + category.image,
+    categories = categories.map((item) => ({
+      ...item.toObject(),
+      image: process.env.BASEURL + item.image,
     }));
-    res.status(200).json({ success: true, categories });
+
+    res.status(200).json({
+      success: true,
+      categories,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
