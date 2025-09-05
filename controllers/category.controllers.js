@@ -76,7 +76,11 @@ const updateCategory = async (req, res) => {
         category[field] = updates[field];
       }
     });
+
     const file = req.file;
+    if (updates.image === null || updates.image === "") {
+      updates.image = undefined;
+    }
     if (file) {
       category.image = `/uploads/categories/${file.filename}`;
     }

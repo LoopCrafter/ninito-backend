@@ -24,6 +24,7 @@ router.patch(
   "/:categoryId",
   requireAuth,
   authorizeRoles("admin"),
+  uploaderManager.single("./uploads/categories", "image"),
   updateCategory
 );
 router.delete(

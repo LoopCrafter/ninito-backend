@@ -17,34 +17,18 @@ const validate = (req, res, next) => {
 };
 
 const requireAuth = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // "Bearer <token>"
+  const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Access token not found" });
+    return res.status(401).json({ msg: "No token, unauthorized" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
     req.userRole = decoded.userRole;
+    req.userId = decoded.id;
     next();
-  } catch (error) {
-    console.log(error);
-    if (error.name === "TokenExpiredError") {
-      return res
-        .status(401)
-        .json({ success: false, message: "Access token expired" });
-    } else if (error.name === "JsonWebTokenError") {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid access token" });
-    } else {
-      return res
-        .status(500)
-        .json({ success: false, message: "Server error verifying token" });
-    }
+  } catch (err) {
+    return res.status(401).json({ msg: "Invalid or expired token" });
   }
 };
 
@@ -57,7 +41,7 @@ const requireVerified = (req, res, next) => {
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.userRole))
-      return res.status(403).json({ msg: "Access denied" });
+      return res.status(401).json({ msg: "Access denied" });
     next();
   };
 };

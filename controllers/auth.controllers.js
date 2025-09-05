@@ -155,7 +155,6 @@ const forgotPassword = async (req, res) => {
     }
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
-    console.log({ user, resetToken });
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpiresAt = resetTokenExpiresAt;
     await user.save();
@@ -214,11 +213,10 @@ const refreshAccessToken = async (req, res) => {
       refreshAccessToken,
       process.env.JWT_REFRESH_SECRET
     );
-
     const accessToken = generateAccessToken(
       res,
       decodedToken.userId,
-      decodedToken.role
+      decodedToken.userRole
     );
     res.status(200).json({ message: "Access token refreshed", accessToken });
   } catch (error) {
