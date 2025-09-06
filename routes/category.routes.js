@@ -8,14 +8,17 @@ import {
 } from "../controllers/category.controllers.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
+import { resizeImage } from "../middlewares/resize.middleware.js";
 
 const router = Router();
+const uploadPath = "./uploads/categories";
 
 router.post(
   "/",
   requireAuth,
   authorizeRoles("admin"),
-  uploaderManager.single("./uploads/categories", "image"),
+  uploaderManager.single(uploadPath, "image"),
+  resizeImage(uploadPath),
   createCategory
 );
 router.get("/all", getCategories);
@@ -24,7 +27,8 @@ router.patch(
   "/:categoryId",
   requireAuth,
   authorizeRoles("admin"),
-  uploaderManager.single("./uploads/categories", "image"),
+  uploaderManager.single(uploadPath, "image"),
+  resizeImage(uploadPath),
   updateCategory
 );
 router.delete(
