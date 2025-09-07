@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createNewProduct,
+  deleteProductById,
   getAllProducts,
   getProductById,
 } from "../controllers/product.controller.js";
@@ -27,5 +28,11 @@ router.post(
 
 router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
+router.delete(
+  "/:productId",
+  requireAuth,
+  authorizeRoles("admin"),
+  deleteProductById
+);
 
 export default router;
