@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { createNewProduct } from "../controllers/product.controller.js";
+import {
+  createNewProduct,
+  getAllProducts,
+} from "../controllers/product.controller.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { productValidations } from "../middlewares/product.middleware.js";
@@ -20,5 +23,7 @@ router.post(
   productValidations,
   createNewProduct
 );
+
+router.get("/", getAllProducts);
 
 export default router;

@@ -23,7 +23,20 @@ const ProductSchema = new Schema(
       },
       value: { type: Number, default: 0 },
     },
-    sizes: [{ type: [String], enum: ["XS", "S", "M", "L", "XL"] }],
+    sizes: [
+      {
+        size: {
+          type: String,
+          enum: ["XS", "S", "M", "L", "XL"],
+          required: true,
+        },
+        stock: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
+      },
+    ],
     colors: [
       {
         name: String,

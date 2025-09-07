@@ -16,12 +16,14 @@ const createNewProduct = async (req, res) => {
       ? req.files.gallery.map((f) => `/uploads/products/${f.filename}`)
       : [];
     const parsedColors = colors ? JSON.parse(colors) : [];
+    const parsedSizes = sizes ? JSON.parse(sizes) : [];
+    console.log(parsedSizes, sizes);
     const product = await Product.create({
       title,
       category,
       price,
       discount,
-      sizes,
+      sizes: parsedSizes,
       colors: parsedColors,
       description,
       thumbnail,
@@ -33,4 +35,13 @@ const createNewProduct = async (req, res) => {
   }
 };
 
-export { createNewProduct };
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export { createNewProduct, getAllProducts };
