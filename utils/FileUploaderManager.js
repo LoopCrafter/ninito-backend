@@ -38,6 +38,10 @@ class FileUploaderManager {
   multiple(uploadPath, fieldName, maxCount = 10) {
     return this.getUploader(uploadPath).array(fieldName, maxCount);
   }
+
+  fields(uploadPath, fieldsConfig) {
+    return this.getUploader(uploadPath).fields(fieldsConfig);
+  }
 }
 
 export default new FileUploaderManager();

@@ -1,20 +1,24 @@
 import { Router } from "express";
-import { Product } from "../models/product.model.js";
+import { createNewProduct } from "../controllers/product.controller.js";
+import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
+import uploaderManager from "./../utils/FileUploaderManager.js";
+import { productValidations } from "../middlewares/product.middleware.js";
 
 const router = Router();
+const uploadPath = "./uploads/products";
 
-router.post("/", async (req, res) => {
-  const newProduct = await Product.create({
-    title: "ست خواب نوزاد",
-    category: "10",
-    price: 120000,
-    discount: { method: "percentage", value: 10 },
-    sizes: ["S", "M"],
-    colors: [{ name: "آبی", hex: "#00f", gallery: ["img1.jpg", "img2.jpg"] }],
-    description: "ست خواب نوزاد بسیار نرم و راحت",
-    thumbnail: "thumb.jpg",
-  });
-  res.status(200).json({ message: "created successfully", success: true });
-});
+const uploadMiddleware = uploaderManager.fields(uploadPath, [
+  { name: "thumbnail", maxCount: 1 },
+  { name: "gallery", maxCount: 8 },
+]);
+
+router.post(
+  "/",
+  requireAuth,
+  authorizeRoles("admin"),
+  uploadMiddleware,
+  productValidations,
+  createNewProduct
+);
 
 export default router;

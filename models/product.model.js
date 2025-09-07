@@ -23,16 +23,16 @@ const ProductSchema = new Schema(
       },
       value: { type: Number, default: 0 },
     },
-    sizes: [{ type: String, enum: ["XS", "S", "M", "L", "XL"] }],
+    sizes: [{ type: [String], enum: ["XS", "S", "M", "L", "XL"] }],
     colors: [
       {
         name: String,
         hex: String,
-        gallery: [String],
       },
     ],
     description: String,
     thumbnail: String,
+    gallery: [String],
   },
   { timestamps: true }
 );
