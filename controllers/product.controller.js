@@ -43,5 +43,15 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+const getProductById = async (req, res) => {
+  const { productId } = req.params;
+  console.log("hamed", productId);
+  try {
+    const products = await Product.find({ _id: productId });
+    res.json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
-export { createNewProduct, getAllProducts };
+export { createNewProduct, getAllProducts, getProductById };

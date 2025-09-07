@@ -27,3 +27,23 @@ export const generateRefreshTokenAndSetCookie = (res, userId, userRole) => {
 export const generateVerificationToken = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
+
+export function applyDefaultTransforms(schema, hiddenFields = []) {
+  function transform(doc, ret) {
+    hiddenFields.forEach((field) => {
+      delete ret[field];
+    });
+    delete ret.__v;
+    return ret;
+  }
+
+  schema.set("toJSON", {
+    virtuals: true,
+    transform,
+  });
+
+  schema.set("toObject", {
+    virtuals: true,
+    transform,
+  });
+}

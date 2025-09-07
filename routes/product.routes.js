@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createNewProduct,
   getAllProducts,
+  getProductById,
 } from "../controllers/product.controller.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
@@ -25,5 +26,6 @@ router.post(
 );
 
 router.get("/", getAllProducts);
+router.get("/:productId", getProductById);
 
 export default router;
