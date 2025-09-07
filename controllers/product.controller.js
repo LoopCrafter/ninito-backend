@@ -45,9 +45,9 @@ const getAllProducts = async (req, res) => {
 };
 const getProductById = async (req, res) => {
   const { productId } = req.params;
-  console.log("hamed", productId);
   try {
     const products = await Product.find({ _id: productId });
+    // conso;
     res.json({ success: true, products });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
