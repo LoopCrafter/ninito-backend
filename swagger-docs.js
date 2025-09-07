@@ -7,6 +7,8 @@
 
 /**
  * @swagger
+ /**
+ * @swagger
  * components:
  *   schemas:
  *     SignupRequest:
@@ -29,6 +31,7 @@
  *         email: user@example.com
  *         password: StrongP@ss1
  *         name: John Doe
+ *
  *     LoginRequest:
  *       type: object
  *       required:
@@ -42,6 +45,7 @@
  *       example:
  *         email: user@example.com
  *         password: StrongP@ss1
+ *
  *     EmailRequest:
  *       type: object
  *       required:
@@ -52,6 +56,7 @@
  *           description: Verification code sent to user's email
  *       example:
  *         code: 123456
+ *
  *     ForgotPasswordRequest:
  *       type: object
  *       required:
@@ -62,6 +67,7 @@
  *           description: User's email address
  *       example:
  *         email: user@example.com
+ *
  *     ResetPasswordRequest:
  *       type: object
  *       required:
@@ -72,6 +78,27 @@
  *           description: New password
  *       example:
  *         password: NewStrongP@ss2
+ *
+ *     CreateCategoryRequest:
+ *       type: object
+ *       required:
+ *         - title
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: Category title
+ *         description:
+ *           type: string
+ *           description: Category description
+ *         image:
+ *           type: string
+ *           format: binary
+ *           description: Category image file
+ *       example:
+ *         title: Baby
+ *         description: This is a sample category for baby products
+ *         image: binary file (e.g., image.jpg)
+ *
  *   responses:
  *     400:
  *       description: Bad request
@@ -79,6 +106,8 @@
  *       description: Unauthorized
  *     404:
  *       description: Not found
+ *     201:
+ *       description: Created successfully
  */
 
 /**
@@ -222,6 +251,90 @@
  *     responses:
  *       200:
  *         description: Current user info
+ *       401:
+ *         $ref: '#/components/responses/401'
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Category
+ *   description:
+ */
+/**
+ * @swagger
+ * /category:
+ *   post:
+ *     summary: Create a new category
+ *     tags: [Category]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateCategoryRequest'
+ *     responses:
+ *       400:
+ *         $ref: '#/components/responses/400'
+ *       401:
+ *         $ref: '#/components/responses/401'
+ */
+
+/**
+ * @swagger
+ * /category/all:
+ *   get:
+ *     summary: List of Categories
+ *     tags: [Category]
+ *     responses:
+ *       400:
+ *         $ref: '#/components/responses/400'
+ *       401:
+ *         $ref: '#/components/responses/401'
+ */
+
+/**
+ * @swagger
+ * /category/{categoryId}:
+ *   patch:
+ *     summary: Update an existing category
+ *     tags: [Category]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the category to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateCategoryRequest'
+ *     responses:
+ *       400:
+ *         $ref: '#/components/responses/400'
+ *       401:
+ *         $ref: '#/components/responses/401'
+ */
+
+/**
+ * @swagger
+ * /category/{categoryId}:
+ *   delete:
+ *     summary: Delete a category by ID
+ *     tags: [Category]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the category to delete
+ *     responses:
+ *       400:
+ *         $ref: '#/components/responses/400'
  *       401:
  *         $ref: '#/components/responses/401'
  */

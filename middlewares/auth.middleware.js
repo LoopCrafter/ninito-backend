@@ -18,6 +18,7 @@ const validate = (req, res, next) => {
 
 const requireAuth = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
+  console.log(req.headers.authorization.split(" "), token);
   if (!token) {
     return res.status(401).json({ msg: "No token, unauthorized" });
   }

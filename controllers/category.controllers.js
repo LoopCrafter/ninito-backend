@@ -25,7 +25,7 @@ const getCategories = async (req, res) => {
     let categories = await Category.find();
     categories = categories.map((item) => ({
       ...item.toObject(),
-      image: process.env.BASEURL + item.image,
+      image: item.image ? process.env.BASEURL + item.image : null,
     }));
 
     res.status(200).json({
