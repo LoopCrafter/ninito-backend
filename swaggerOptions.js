@@ -2,10 +2,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Auth API",
+      title: "Ninito API",
       version: "1.0.0",
-      description:
-        "this is a simple API application made with Express and documented with Swagger",
+      description: "this is a API Application for Ninitoo.ir shop",
     },
     servers: [
       {

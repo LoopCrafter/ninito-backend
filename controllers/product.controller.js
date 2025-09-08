@@ -37,8 +37,38 @@ const createNewProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    return res.json({ success: true, products });
+    let {
+      search = "",
+      sort = "createdAt",
+      order = "asc",
+      page = 1,
+      limit = 10,
+      filter = {},
+    } = req.query;
+
+    const skip = (page - 1) * limit;
+    const conditions = {};
+
+    if (filter.category) conditions.category = filter.category;
+    if (filter.inStock) conditions["sizes.stock"] = { $gt: 0 };
+    if (filter.minPrice || filter.maxPrice) {
+      conditions.price = {};
+      if (filter.minPrice) conditions.price.$gte = parseInt(filter.minPrice);
+      if (filter.maxPrice) conditions.price.$lte = parseInt(filter.maxPrice);
+    }
+    if (search) {
+      conditions.title = { $regex: search, $options: "i" };
+    }
+
+    const sortOption = {};
+    sortOption[sort] = order === "asc" ? 1 : -1;
+
+    const products = await Product.find(conditions)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+    const total = await Product.countDocuments(conditions);
+    return res.json({ success: true, page, limit, total, products });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }

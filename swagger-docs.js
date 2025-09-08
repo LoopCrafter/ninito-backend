@@ -338,3 +338,10 @@
  *       401:
  *         $ref: '#/components/responses/401'
  */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Products
+ *   description: products crud APIs
+ */
