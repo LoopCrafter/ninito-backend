@@ -87,7 +87,12 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   const { productId } = req.params;
   try {
-    const product = await Product.findOne({ _id: productId });
+    const product = await Product.findOne({ _id: productId }).populate({
+      path: "comments",
+      select: "productId text userId",
+      populate: { path: "userId", select: "name email" },
+    });
+
     if (!product) {
       return res
         .status(404)
@@ -95,25 +100,17 @@ const getProductById = async (req, res) => {
     }
 
     let productObj = product.toObject();
-
-    if (product.comments.length > 0) {
-      const comments = await Comment.find({ _id: { $in: product.comments } })
-        .populate("userId", "name email")
-        .select("productId text");
-
-      if (comments.length > 0) {
-        const transformedComments = comments.map((comment) => ({
-          id: comment._id.toString(),
-          productId: comment.productId.toString(),
-          user: {
-            id: comment.userId._id.toString(),
-            name: comment.userId.name,
-            email: comment.userId.email,
-          },
-          text: comment.text,
-        }));
-        productObj.comments = transformedComments;
-      }
+    if (productObj.comments.length > 0) {
+      productObj.comments = productObj.comments.map((comment) => ({
+        id: comment._id.toString(),
+        productId: comment.productId.toString(),
+        user: {
+          id: comment.userId._id.toString(),
+          name: comment.userId.name,
+          email: comment.userId.email,
+        },
+        text: comment.text,
+      }));
     }
 
     return res.json({ success: true, product: productObj });

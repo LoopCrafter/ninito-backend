@@ -38,4 +38,4 @@ const CommentSchema = new Schema({
   },
 });
 
-export const Comment = model("comment", CommentSchema);
+export const Comment = model("Comment", CommentSchema);
