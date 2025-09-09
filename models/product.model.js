@@ -1,4 +1,4 @@
-import { Schema, SchemaType, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { applyDefaultTransforms } from "../utils/index.js";
 
 const ProductSchema = new Schema(

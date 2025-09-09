@@ -3,11 +3,12 @@ import { connectDB } from "./db/connectDB.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerOptions from "./swaggerOptions.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
-import cookieParser from "cookie-parser";
-import cors from "cors";
+import commentRoutes from "./routes/comment.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/product`, productRoutes);
 app.use(`${BASE_PATH}/category`, categoryRoutes);
+app.use(`${BASE_PATH}/comment`, commentRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

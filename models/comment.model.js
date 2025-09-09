@@ -1,4 +1,4 @@
-import { schema, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 const CommentSchema = new Schema({
   productId: {
@@ -17,9 +17,11 @@ const CommentSchema = new Schema({
   },
   replies: [
     {
-      userId: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
       text: {
         type: String,
         required: true,
@@ -36,4 +38,4 @@ const CommentSchema = new Schema({
   },
 });
 
-const Comment = model("comment", CommentSchema);
+export const Comment = model("comment", CommentSchema);

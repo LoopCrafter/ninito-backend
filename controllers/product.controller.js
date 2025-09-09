@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 import { Product } from "../models/product.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const createNewProduct = async (req, res) => {
   const errors = validationResult(req.body);
@@ -92,7 +93,30 @@ const getProductById = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Product not found" });
     }
-    return res.json({ success: true, product });
+
+    let productObj = product.toObject();
+
+    if (product.comments.length > 0) {
+      const comments = await Comment.find({ _id: { $in: product.comments } })
+        .populate("userId", "name email")
+        .select("productId text");
+
+      if (comments.length > 0) {
+        const transformedComments = comments.map((comment) => ({
+          id: comment._id.toString(),
+          productId: comment.productId.toString(),
+          user: {
+            id: comment.userId._id.toString(),
+            name: comment.userId.name,
+            email: comment.userId.email,
+          },
+          text: comment.text,
+        }));
+        productObj.comments = transformedComments;
+      }
+    }
+
+    return res.json({ success: true, product: productObj });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
