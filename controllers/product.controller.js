@@ -77,7 +77,12 @@ const getAllProducts = async (req, res) => {
     const products = await Product.find(conditions)
       .sort(selectedSort)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate({
+        path: "comments",
+        select: "productId text userId",
+        populate: { path: "userId", select: "name email" },
+      });
     const total = await Product.countDocuments(conditions);
     return res.json({ success: true, page, limit, total, products });
   } catch (error) {
