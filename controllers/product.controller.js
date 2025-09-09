@@ -114,4 +114,5 @@ const deleteProductById = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
 export { createNewProduct, getAllProducts, getProductById, deleteProductById };

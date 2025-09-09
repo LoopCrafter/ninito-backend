@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, SchemaType, model } from "mongoose";
 import { applyDefaultTransforms } from "../utils/index.js";
 
 const ProductSchema = new Schema(
@@ -42,6 +42,12 @@ const ProductSchema = new Schema(
       {
         name: String,
         hex: String,
+      },
+    ],
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Comment",
       },
     ],
     description: String,
