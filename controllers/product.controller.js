@@ -60,11 +60,21 @@ const getAllProducts = async (req, res) => {
       conditions.title = { $regex: search, $options: "i" };
     }
 
-    const sortOption = {};
-    sortOption[sort] = order === "asc" ? 1 : -1;
-
+    const sortOptions = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      cheapest: { price: 1 },
+      expensive: { price: -1 },
+      mostViewed: { views: -1 },
+      bestSelling: { soldCount: -1 },
+      fastestShipping: { deliveryTime: 1 },
+      topRated: { averageRating: -1 },
+      featured: { isFeatured: -1, createdAt: -1 },
+    };
+    sortOptions[sort] = order === "asc" ? 1 : -1;
+    const selectedSort = sortOptions[req.query.sortBy] || { createdAt: -1 };
     const products = await Product.find(conditions)
-      .sort(sortOption)
+      .sort(selectedSort)
       .skip(skip)
       .limit(limit);
     const total = await Product.countDocuments(conditions);
