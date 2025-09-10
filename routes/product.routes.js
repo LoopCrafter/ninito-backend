@@ -26,7 +26,7 @@ router.post(
   createNewProduct
 );
 
-router.get("/", getAllProducts);
+router.get("/all", getAllProducts);
 router.get("/:productId", getProductById);
 router.delete(
   "/:productId",

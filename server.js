@@ -17,9 +17,7 @@ app.use(cookieParser());
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 const specs = swaggerJsdoc(swaggerOptions);
-app.get("/", (req, res) => {
-  res.send("OK");
-});
+
 const BASE_PATH = "/api/v1";
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use(`${BASE_PATH}/auth`, authRoutes);

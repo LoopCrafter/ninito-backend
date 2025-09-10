@@ -78,6 +78,8 @@ const getAllProducts = async (req, res) => {
       .sort(selectedSort)
       .skip(skip)
       .limit(limit)
+
+      .populate("category", "title image id")
       .populate({
         path: "comments",
         select: "productId text userId",
