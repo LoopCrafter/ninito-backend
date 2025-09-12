@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { v4 as uuidv4 } from "uuid";
 
 class FileUploaderManager {
   constructor() {
@@ -21,7 +22,8 @@ class FileUploaderManager {
         destination: (req, file, cb) => cb(null, uploadPath),
         filename: (req, file, cb) => {
           const ext = path.extname(file.originalname);
-          const name = file.fieldname + "-" + Date.now() + ext;
+          const uniqueSuffix = Date.now() + "-" + uuidv4();
+          const name = file.fieldname + "-" + uniqueSuffix + ext;
           cb(null, name);
         },
       });

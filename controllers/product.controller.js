@@ -10,6 +10,7 @@ const createNewProduct = async (req, res) => {
   try {
     const { title, category, price, discount, sizes, colors, description } =
       req.body;
+
     const thumbnail = req.files?.thumbnail
       ? `/uploads/products/${req.files.thumbnail[0].filename}`
       : null;
@@ -94,11 +95,13 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   const { productId } = req.params;
   try {
-    const product = await Product.findOne({ _id: productId }).populate({
-      path: "comments",
-      select: "productId text userId",
-      populate: { path: "userId", select: "name email" },
-    });
+    const product = await Product.findOne({ _id: productId })
+      .populate({
+        path: "comments",
+        select: "productId text userId",
+        populate: { path: "userId", select: "name email" },
+      })
+      .populate("category", "title image id");
 
     if (!product) {
       return res
