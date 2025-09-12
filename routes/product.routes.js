@@ -4,6 +4,7 @@ import {
   deleteProductById,
   getAllProducts,
   getProductById,
+  updateProduct,
 } from "../controllers/product.controller.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
@@ -33,6 +34,14 @@ router.delete(
   requireAuth,
   authorizeRoles("admin"),
   deleteProductById
+);
+router.patch(
+  "/:productId",
+  requireAuth,
+  authorizeRoles("admin"),
+  uploadMiddleware,
+  // productValidations,
+  updateProduct
 );
 
 export default router;

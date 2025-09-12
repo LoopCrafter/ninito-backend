@@ -44,7 +44,7 @@ const getAllProducts = async (req, res) => {
       sort = "createdAt",
       order = "asc",
       page = 1,
-      limit = 10,
+      limit = 5,
       filter = {},
     } = req.query;
 
@@ -87,7 +87,14 @@ const getAllProducts = async (req, res) => {
         populate: { path: "userId", select: "name email" },
       });
     const total = await Product.countDocuments(conditions);
-    return res.json({ success: true, page, limit, total, products });
+    return res.json({
+      success: true,
+      page,
+      limit,
+      total,
+      products,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
@@ -146,4 +153,45 @@ const deleteProductById = async (req, res) => {
   }
 };
 
-export { createNewProduct, getAllProducts, getProductById, deleteProductById };
+const updateProduct = async (req, res) => {
+  // const errors = validationResult(req.body);
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({ success: false, errors: errors.array() });
+  // }
+  const { productId } = req.params;
+  try {
+    const { title, category, price, discount, sizes, colors, description } =
+      req.body;
+    const parsedDiscount = discount ? JSON.parse(discount) : undefined;
+    const parsedSizes = sizes ? JSON.parse(sizes) : undefined;
+    const parsedColors = colors ? JSON.parse(colors) : undefined;
+
+    // ساخت شیء به‌روزرسانی
+    const updateData = {
+      title,
+      categoryId: category.id, // اصلاح به categoryId
+      price,
+      discount: parsedDiscount,
+      sizes: parsedSizes,
+      colors: parsedColors,
+      description,
+    };
+
+    const product = await Product.updateOne({ _id: productId }, updateData);
+
+    res.json({
+      message: "successfully Updated",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export {
+  createNewProduct,
+  getAllProducts,
+  getProductById,
+  deleteProductById,
+  updateProduct,
+};
