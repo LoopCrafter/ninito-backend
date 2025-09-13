@@ -75,25 +75,34 @@ const getAllProducts = async (req, res) => {
     };
     sortOptions[sort] = order === "asc" ? 1 : -1;
     const selectedSort = sortOptions[req.query.sortBy] || { createdAt: -1 };
-    const products = await Product.find(conditions)
-      .sort(selectedSort)
-      .skip(skip)
-      .limit(limit)
+    const [products, total] = await Promise.all([
+      Product.find(conditions)
+        .sort(selectedSort)
+        .skip(skip)
+        .limit(limit)
+        .populate("category", "title image id")
+        .populate({
+          path: "comments",
+          select: "productId text userId",
+          populate: { path: "userId", select: "name email" },
+        }),
+      Product.countDocuments(conditions),
+    ]);
 
-      .populate("category", "title image id")
-      .populate({
-        path: "comments",
-        select: "productId text userId",
-        populate: { path: "userId", select: "name email" },
-      });
-    const total = await Product.countDocuments(conditions);
+    const totalPages = Math.ceil(total / limit);
+
     return res.json({
       success: true,
       page,
       limit,
       total,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+      nextPage: page < totalPages ? page + 1 : null,
+      prevPage: page > 1 ? page - 1 : null,
+      lastPage: totalPages,
       products,
-      totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
@@ -166,7 +175,6 @@ const updateProduct = async (req, res) => {
     const parsedSizes = sizes ? JSON.parse(sizes) : undefined;
     const parsedColors = colors ? JSON.parse(colors) : undefined;
 
-    // ساخت شیء به‌روزرسانی
     const updateData = {
       title,
       categoryId: category.id, // اصلاح به categoryId
