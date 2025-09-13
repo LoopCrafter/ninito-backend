@@ -9,7 +9,7 @@ import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
-
+import settingsRoutes from "./routes/settings.routes.js";
 const app = express();
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -24,6 +24,7 @@ app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/product`, productRoutes);
 app.use(`${BASE_PATH}/category`, categoryRoutes);
 app.use(`${BASE_PATH}/comment`, commentRoutes);
+app.use(`${BASE_PATH}/settings`, settingsRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

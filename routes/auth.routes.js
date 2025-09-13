@@ -48,7 +48,7 @@ router.post(
   validate,
   login
 );
-router.get("/logout", requireAuth, logout);
+router.post("/logout", requireAuth, logout);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", loginLimiter, forgotPassword);
 router.post("/reset-password/:token", loginLimiter, resetPassword);
