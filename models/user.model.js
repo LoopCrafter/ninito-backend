@@ -23,6 +23,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     image: {
       type: String,
     },
