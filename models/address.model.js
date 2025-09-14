@@ -5,7 +5,7 @@ const addressSchema = new Schema(
     address: { type: String, required: true },
     city: { type: String, required: true },
     province: { type: String, required: true },
-    postalCode: { type: String },
+    postalCode: { type: String, required: true },
     location: {
       type: { type: String, enum: ["Point"] },
       coordinates: { type: [Number] },
@@ -15,7 +15,5 @@ const addressSchema = new Schema(
   },
   { timestamps: true }
 );
-
-addressSchema.index({ location: "2dsphere" });
 
 export const Address = model("Address", addressSchema);

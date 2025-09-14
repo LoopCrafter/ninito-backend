@@ -21,7 +21,7 @@ router.post(
   resizeImage(uploadPath),
   createCategory
 );
-router.get("/all", getCategories);
+router.get("/", getCategories);
 router.get("/:categoryId", categoryDetail);
 router.patch(
   "/:categoryId",

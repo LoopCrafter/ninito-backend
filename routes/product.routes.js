@@ -5,7 +5,7 @@ import {
   getAllProducts,
   getProductById,
   updateProduct,
-} from "../controllers/product.controller.js";
+} from "../controllers/product.controllers.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { productValidations } from "../middlewares/product.middleware.js";
@@ -27,7 +27,7 @@ router.post(
   createNewProduct
 );
 
-router.get("/all", getAllProducts);
+router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
 router.delete(
   "/:productId",

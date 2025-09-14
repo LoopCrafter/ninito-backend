@@ -21,7 +21,6 @@ const requireAuth = (req, res, next) => {
     return res.status(401).json({ msg: "No token, unauthorized" });
   }
   const token = req.headers.authorization?.split(" ")[1];
-  console.log(req.headers.authorization.split(" "), token);
   if (!token) {
     return res.status(401).json({ msg: "No token, unauthorized" });
   }
@@ -29,7 +28,7 @@ const requireAuth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userRole = decoded.userRole;
-    req.userId = decoded.id;
+    req.userId = decoded.userId;
     next();
   } catch (err) {
     return res.status(401).json({ msg: "Invalid or expired token" });

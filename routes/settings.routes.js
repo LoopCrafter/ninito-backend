@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   getSettings,
   setSettings,
-} from "../controllers/settings.controller.js";
+} from "../controllers/settings.controllers.js";
 
 const router = Router();
 

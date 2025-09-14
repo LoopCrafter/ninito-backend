@@ -6,7 +6,7 @@ import {
   deleteComment,
   getComments,
   updateComment,
-} from "../controllers/comment.controller.js";
+} from "../controllers/comment.controllers.js";
 import { body } from "express-validator";
 
 router.post(
