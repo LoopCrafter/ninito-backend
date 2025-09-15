@@ -11,7 +11,14 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = (req, res) => {
   const { id } = req.params;
-  res.send(`Get user with ID: ${id}`);
+  if (id !== req.userId) {
+    return res.status(403).json({ message: "Access denied", success: false });
+  }
+  const user = User.findById(id).select("-password -role");
+  if (!user) {
+    return res.status(404).json({ message: "User not found", success: false });
+  }
+  res.status(200).json({ user, success: true });
 };
 
 export { getAllUsers, getUserById };
