@@ -10,9 +10,7 @@ export const resizeImage = (uploadPath) => async (req, res, next) => {
   console.log("resize", { filePath, ext, filename, outputPath });
 
   try {
-    await sharp(filePath)
-      .resize(200, 200, { fit: "contain" })
-      .toFile(outputPath);
+    await sharp(filePath).resize(400, 400, { fit: "cover" }).toFile(outputPath);
 
     req.file.filename = filename;
     req.file.path = outputPath;
