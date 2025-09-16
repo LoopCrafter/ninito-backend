@@ -1,6 +1,7 @@
 import { Address } from "../models/address.model.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
+import { getNextOrderNumber } from "../utils/getNextOrderNumber.js";
 const createOrder = async (req, res) => {
   let { addressId, items, newAddress, totalPrice } = req.body;
   const userId = req.userId;
@@ -22,21 +23,26 @@ const createOrder = async (req, res) => {
     });
     addressId = createdAddress._id;
   }
-  let calculatedTotal = 0;
 
-  const itemsWithPrice = await Promise.all(
-    items.map(async (item) => {
-      const product = await Product.findById(item.productId);
-      if (!product) throw new Error("محصول یافت نشد");
-      if (product.stock < item.quantity) throw new Error("موجودی کافی نیست");
-      calculatedTotal += product.price * item.quantity;
-      return {
-        productId: product._id,
-        quantity: item.quantity,
-        price: product.price,
-      };
-    })
-  );
+  const seq = await getNextOrderNumber();
+  const orderNumber = `ORD-${new Date().getFullYear()}-${seq}`;
+
+  const productIds = items.map((i) => i.productId);
+  const products = await Product.find({ _id: { $in: productIds } });
+  const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+
+  let calculatedTotal = 0;
+  const itemsWithPrice = items.map((item) => {
+    const product = productMap.get(item.productId);
+    if (!product) throw new Error("محصول یافت نشد");
+    if (product.stock < item.quantity) throw new Error("موجودی کافی نیست");
+    calculatedTotal += product.price * item.quantity;
+    return {
+      productId: product._id,
+      quantity: item.quantity,
+      price: product.price,
+    };
+  });
 
   if (calculatedTotal !== totalPrice) {
     throw new Error("قیمت تغییر کرده است، لطفاً دوباره تلاش کنید");
@@ -50,6 +56,7 @@ const createOrder = async (req, res) => {
     status: "pending",
     paymentStatus: "unpaid",
     paymentMethod: "online",
+    orderNumber,
   });
 
   res.status(201).json({ message: "Order created", order });

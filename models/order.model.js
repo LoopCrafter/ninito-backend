@@ -7,6 +7,11 @@ const orderSchema = new Schema(
       ref: "User",
       required: true,
     },
+    orderNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     addressId: {
       type: Schema.Types.ObjectId,
       ref: "Address",
