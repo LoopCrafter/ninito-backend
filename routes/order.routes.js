@@ -1,25 +1,33 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createOrder } from "../controllers/orderController.js";
-import { validate } from "../middlewares/validate.js";
+import { requireAuth } from "../middlewares/auth.middleware.js";
+import { createOrder } from "../controllers/order.controllers.js";
+import { validate } from "../middlewares/validate.middleware.js";
 
 const router = Router();
 
 router.post(
-  "/create",
+  "/",
+  requireAuth,
   [
-    body("userId").isMongoId().withMessage("Invalid userId"),
     body("addressId").optional().isMongoId().withMessage("Invalid addressId"),
-    body("address")
+    body("newAddress")
       .optional()
       .custom((value, { req }) => {
         if (!req.body.addressId && !value) {
           throw new Error("Either addressId or address details are required");
         }
         if (value) {
-          if (!value.city || !value.street || !value.postalCode) {
+          if (
+            !value.city ||
+            !value.postalCode ||
+            !value.title ||
+            !value.province ||
+            !value.title ||
+            !value.address
+          ) {
             throw new Error(
-              "City, street, and postalCode are required in address"
+              "Title, Address, Province, City, and postalCode are required in address"
             );
           }
         }

@@ -9,7 +9,7 @@ import commentRoutes from "./comment.routes.js";
 import settingsRoutes from "./settings.routes.js";
 import addressRoutes from "./address.routes.js";
 import userRoutes from "./user.routes.js";
-
+import orderRoutes from "./order.routes.js";
 const router = Router();
 const BASE_PATH = "/api/v1";
 
@@ -23,5 +23,6 @@ router.use(`${BASE_PATH}/comments`, commentRoutes);
 router.use(`${BASE_PATH}/settings`, settingsRoutes);
 router.use(`${BASE_PATH}/addresses`, addressRoutes);
 router.use(`${BASE_PATH}/users`, userRoutes);
+router.use(`${BASE_PATH}/orders`, orderRoutes);
 
 export default router;
