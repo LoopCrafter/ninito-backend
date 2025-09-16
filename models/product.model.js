@@ -74,4 +74,4 @@ ProductSchema.virtual("galleryUrls").get(function () {
 
 applyDefaultTransforms(ProductSchema, ["thumbnail", "gallery"]);
 
-export const Product = model("product", ProductSchema);
+export const Product = model("Product", ProductSchema);

@@ -2,6 +2,7 @@ import { Address } from "../models/address.model.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { getNextOrderNumber } from "../utils/getNextOrderNumber.js";
+import mongoose from "mongoose";
 const createOrder = async (req, res) => {
   let { addressId, items, newAddress, totalPrice } = req.body;
   const userId = req.userId;
@@ -19,7 +20,7 @@ const createOrder = async (req, res) => {
       city,
       province,
       postalCode,
-      userId,
+      user: userId,
     });
     addressId = createdAddress._id;
   }
@@ -49,7 +50,7 @@ const createOrder = async (req, res) => {
   }
 
   const order = await Order.create({
-    userId,
+    user: userId,
     addressId,
     items: itemsWithPrice,
     totalPrice,
@@ -62,4 +63,13 @@ const createOrder = async (req, res) => {
   res.status(201).json({ message: "Order created", order });
 };
 
-export { createOrder };
+const getOrders = async (req, res) => {
+  const userId = req.userId;
+  const orders = await Order.find({ user: userId })
+    .populate("user", "id name email")
+    .populate("address", "id title address city province postalCode")
+    .populate("items.product", "title price finalPrice thumbnail gallery");
+
+  res.json({ orders });
+};
+export { createOrder, getOrders };
