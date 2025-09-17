@@ -65,11 +65,36 @@ const createOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
   const userId = req.userId;
-  const orders = await Order.find({ user: userId })
-    .populate("user", "id name email")
-    .populate("address", "id title address city province postalCode")
-    .populate("items.product", "title price finalPrice thumbnail gallery");
+  try {
+    const orders = await Order.find({ user: userId })
+      .populate("user", "id name email")
+      .populate("address", "id title address city province postalCode")
+      .populate("items.product", "title price finalPrice thumbnail gallery");
 
-  res.json({ orders });
+    res.json({ orders });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
-export { createOrder, getOrders };
+
+const getOrderById = async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    if (order.user.toString() !== req.userId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const populatedOrder = await Order.findById(orderId)
+      .populate("user", "id name email")
+      .populate("address", "id title address city province postalCode")
+      .populate("items.product", "title price finalPrice thumbnail gallery");
+
+    res.json({ order: populatedOrder, success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export { createOrder, getOrders, getOrderById };
