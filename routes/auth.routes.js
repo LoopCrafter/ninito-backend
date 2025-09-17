@@ -10,11 +10,8 @@ import {
   userInfo,
 } from "../controllers/auth.controllers.js";
 import { body } from "express-validator";
-import {
-  loginLimiter,
-  validate,
-  requireAuth,
-} from "../middlewares/auth.middleware.js";
+import { loginLimiter, requireAuth } from "../middlewares/auth.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
 
 const router = Router();
 
@@ -23,6 +20,7 @@ router.post(
   loginLimiter,
   [
     body("email").isEmail().withMessage("Email is not valid"),
+    body("phone").isMobilePhone("fa-IR").withMessage("شماره موبایل معتبر نیست"),
     body("password")
       .isStrongPassword({
         minLength: 8,

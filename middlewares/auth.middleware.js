@@ -8,14 +8,6 @@ const loginLimiter = rateLimit({
   message: "Too many login attempts, please try again later.",
 });
 
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
-
 const requireAuth = (req, res, next) => {
   if (!req.headers.authorization) {
     return res.status(401).json({ msg: "No token, unauthorized" });

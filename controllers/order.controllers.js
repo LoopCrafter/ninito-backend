@@ -67,7 +67,7 @@ const getOrders = async (req, res) => {
   const userId = req.userId;
   try {
     const orders = await Order.find({ user: userId })
-      .populate("user", "id name email")
+      .populate("user", "id name email phone")
       .populate("address", "id title address city province postalCode")
       .populate("items.product", "title price finalPrice thumbnail gallery");
 
@@ -88,7 +88,7 @@ const getOrderById = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
     const populatedOrder = await Order.findById(orderId)
-      .populate("user", "id name email")
+      .populate("user", "id name email phone")
       .populate("address", "id title address city province postalCode")
       .populate("items.product", "title price finalPrice thumbnail gallery");
 
