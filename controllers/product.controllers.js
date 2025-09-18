@@ -3,12 +3,8 @@ import { Product } from "../models/product.model.js";
 import { Comment } from "../models/comment.model.js";
 
 const createNewProduct = async (req, res) => {
-  const errors = validationResult(req.body);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
-  }
   try {
-    const { title, category, price, discount, sizes, colors, description } =
+    const { title, category, variants, basePrice, discount, description } =
       req.body;
 
     const thumbnail = req.files?.thumbnail
@@ -17,15 +13,25 @@ const createNewProduct = async (req, res) => {
     const gallery = req.files?.gallery
       ? req.files.gallery.map((f) => `/uploads/products/${f.filename}`)
       : [];
-    const parsedColors = colors ? JSON.parse(colors) : [];
-    const parsedSizes = sizes ? JSON.parse(sizes) : [];
+
+    const parsedVariants = variants ? JSON.parse(variants) : [];
+    const parsedDiscount = discount
+      ? JSON.parse(discount)
+      : { method: "percentage", value: 0 };
+
+    if (!parsedVariants.length && !basePrice) {
+      return res.status(400).json({
+        success: false,
+        message: "باید یا variants یا basePrice مشخص شود",
+      });
+    }
+
     const product = await Product.create({
       title,
       category,
-      price,
-      discount,
-      sizes: parsedSizes,
-      colors: parsedColors,
+      variants: parsedVariants,
+      basePrice: basePrice ? parseFloat(basePrice) : undefined,
+      discount: parsedDiscount,
       description,
       thumbnail,
       gallery,
@@ -51,11 +57,26 @@ const getAllProducts = async (req, res) => {
     const conditions = {};
 
     if (filter.category) conditions.category = filter.category;
-    if (filter.inStock) conditions["sizes.stock"] = { $gt: 0 };
+
+    if (filter.inStock) {
+      conditions.$or = [
+        { "variants.stock": { $gt: 0 } },
+        { baseStock: { $gt: 0 } },
+      ];
+    }
+
+    // Filter by price range
     if (filter.minPrice || filter.maxPrice) {
-      conditions.price = {};
-      if (filter.minPrice) conditions.price.$gte = parseInt(filter.minPrice);
-      if (filter.maxPrice) conditions.price.$lte = parseInt(filter.maxPrice);
+      conditions.$or = [{ "variants.price": {} }, { basePrice: {} }];
+
+      if (filter.minPrice) {
+        conditions.$or[0]["variants.price"].$gte = parseInt(filter.minPrice);
+        conditions.$or[1].basePrice.$gte = parseInt(filter.minPrice);
+      }
+      if (filter.maxPrice) {
+        conditions.$or[0]["variants.price"].$lte = parseInt(filter.maxPrice);
+        conditions.$or[1].basePrice.$lte = parseInt(filter.maxPrice);
+      }
     }
     if (search) {
       conditions.title = { $regex: search, $options: "i" };
@@ -64,8 +85,8 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {
       newest: { createdAt: -1 },
       oldest: { createdAt: 1 },
-      cheapest: { price: 1 },
-      expensive: { price: -1 },
+      cheapest: { basePrice: 1, "variants.price": 1 },
+      expensive: { basePrice: -1, "variants.price": -1 },
       mostViewed: { views: -1 },
       bestSelling: { soldCount: -1 },
       fastestShipping: { deliveryTime: 1 },
@@ -162,29 +183,44 @@ const deleteProductById = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  
   const { productId } = req.params;
   try {
-    const { title, category, price, discount, sizes, colors, description } =
+    const { title, category, variants, basePrice, discount, description } =
       req.body;
+    const parsedVariants = variants ? JSON.parse(variants) : undefined;
     const parsedDiscount = discount ? JSON.parse(discount) : undefined;
-    const parsedSizes = sizes ? JSON.parse(sizes) : undefined;
-    const parsedColors = colors ? JSON.parse(colors) : undefined;
 
     const updateData = {
       title,
-      categoryId: category.id,
-      price,
+      category,
+      variants: parsedVariants,
+      basePrice: basePrice ? parseFloat(basePrice) : undefined,
       discount: parsedDiscount,
-      sizes: parsedSizes,
-      colors: parsedColors,
       description,
     };
 
-    const product = await Product.updateOne({ _id: productId }, updateData);
+    // Remove undefined values
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
+    const product = await Product.findByIdAndUpdate(productId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "محصول یافت نشد",
+      });
+    }
 
     res.json({
-      message: "successfully Updated",
+      success: true,
+      message: "محصول با موفقیت بروزرسانی شد",
       product,
     });
   } catch (error) {

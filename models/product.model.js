@@ -16,8 +16,16 @@ const ProductSchema = new Schema(
       },
     ],
 
-    basePrice: { type: Number }, // فقط وقتی variants نداره
-
+    basePrice: {
+      type: Number,
+      min: 0,
+      validate: {
+        validator: function () {
+          return !this.variants || this.variants.length === 0;
+        },
+        message: "basePrice فقط برای محصولات بدون variant مجازه",
+      },
+    },
     discount: {
       method: {
         type: String,
@@ -57,6 +65,19 @@ ProductSchema.virtual("galleryUrls").get(function () {
   if (!this.gallery || this.gallery.length === 0) return [];
   return this.gallery.map((img) => `${process.env.BASEURL}${img}`);
 });
+
+ProductSchema.virtual("finalBasePrice").get(function () {
+  if (!this.basePrice) return null;
+  if (!this.discount || this.discount.value <= 0) return this.basePrice;
+
+  return this.discount.method === "percentage"
+    ? this.basePrice - (this.basePrice * this.discount.value) / 100
+    : this.basePrice - this.discount.value;
+});
+
+ProductSchema.index({ category: 1, status: 1 });
+ProductSchema.index({ "variants.sku": 1 });
+ProductSchema.index({ totalStock: 1 });
 
 applyDefaultTransforms(ProductSchema, ["thumbnail", "gallery"]);
 

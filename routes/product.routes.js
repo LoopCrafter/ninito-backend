@@ -6,7 +6,11 @@ import {
   getProductById,
   updateProduct,
 } from "../controllers/product.controllers.js";
-import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
+import {
+  authorizeRoles,
+  requireAuth,
+  validate,
+} from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { productValidations } from "../middlewares/product.middleware.js";
 
@@ -24,6 +28,7 @@ router.post(
   authorizeRoles("admin"),
   uploadMiddleware,
   productValidations,
+  validate,
   createNewProduct
 );
 
