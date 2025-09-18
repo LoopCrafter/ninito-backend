@@ -34,6 +34,8 @@ const orderSchema = new Schema(
           required: true,
           min: 0,
         },
+        size: String,
+        color: String,
       },
     ],
     totalPrice: {

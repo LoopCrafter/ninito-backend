@@ -3,19 +3,21 @@ import { applyDefaultTransforms } from "../utils/index.js";
 
 const ProductSchema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
+    title: String,
+    category: { type: Schema.Types.ObjectId, ref: "Category" },
+
+    variants: [
+      {
+        size: { type: String, enum: ["XS", "S", "M", "L", "XL"] },
+        color: { name: String, hex: String },
+        price: { type: Number, required: true },
+        stock: { type: Number, default: 0, min: 0 },
+        sku: String,
+      },
+    ],
+
+    basePrice: { type: Number }, // فقط وقتی variants نداره
+
     discount: {
       method: {
         type: String,
@@ -24,32 +26,7 @@ const ProductSchema = new Schema(
       },
       value: { type: Number, default: 0 },
     },
-    sizes: [
-      {
-        size: {
-          type: String,
-          enum: ["XS", "S", "M", "L", "XL"],
-          required: true,
-        },
-        stock: {
-          type: Number,
-          default: 0,
-          min: 0,
-        },
-      },
-    ],
-    colors: [
-      {
-        name: String,
-        hex: String,
-      },
-    ],
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
+
     description: String,
     thumbnail: String,
     gallery: [String],
@@ -57,12 +34,21 @@ const ProductSchema = new Schema(
   { timestamps: true }
 );
 
-ProductSchema.virtual("finalPrice").get(function () {
-  if (!this.discount || !this.discount.value) return this.price;
-  return this.discount.type === "percentage"
-    ? this.price - (this.price * this.discount.value) / 100
-    : this.price - this.discount.value;
+productSchema.virtual("variantsWithFinalPrice").get(function () {
+  if (!this.variants || this.variants.length === 0) return [];
+
+  return this.variants.map((variant) => {
+    let finalPrice = variant.price;
+    if (this.discount && this.discount.value > 0) {
+      finalPrice =
+        this.discount.method === "percentage"
+          ? variant.price - (variant.price * this.discount.value) / 100
+          : variant.price - this.discount.value;
+    }
+    return { ...variant.toObject(), finalPrice };
+  });
 });
+
 ProductSchema.virtual("thumbnailUrl").get(function () {
   return this.thumbnail ? `${process.env.BASEURL}${this.thumbnail}` : null;
 });
