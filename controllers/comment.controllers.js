@@ -13,9 +13,16 @@ const createComment = async (req, res) => {
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
+
       product.comments.push(comment._id);
       await product.save();
-      return res.json({ message: "New comment created", success: true });
+
+      return res.json({
+        message: "New comment created",
+        success: true,
+        comment,
+        productComments: product.comments,
+      });
     }
   } catch (error) {
     console.error(error);

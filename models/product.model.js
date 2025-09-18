@@ -38,6 +38,7 @@ const ProductSchema = new Schema(
     description: String,
     thumbnail: String,
     gallery: [String],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
 );

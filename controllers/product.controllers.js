@@ -106,6 +106,7 @@ const getAllProducts = async (req, res) => {
           select: "productId text userId",
           populate: { path: "userId", select: "name email" },
         }),
+
       Product.countDocuments(conditions),
     ]);
 
