@@ -22,7 +22,7 @@ const createOrder = async (req, res) => {
       postalCode,
       user: userId,
     });
-    addressId = createdAddress._id;
+    address = createdAddress._id;
   }
 
   const seq = await getNextOrderNumber();
@@ -34,12 +34,12 @@ const createOrder = async (req, res) => {
 
   let calculatedTotal = 0;
   const itemsWithPrice = items.map((item) => {
-    const product = productMap.get(item.productId);
+    const product = productMap.get(item.product);
     if (!product) throw new Error("محصول یافت نشد");
     if (product.stock < item.quantity) throw new Error("موجودی کافی نیست");
     calculatedTotal += product.price * item.quantity;
     return {
-      productId: product._id,
+      product: product._id,
       quantity: item.quantity,
       price: product.price,
     };
@@ -51,7 +51,7 @@ const createOrder = async (req, res) => {
 
   const order = await Order.create({
     user: userId,
-    addressId,
+    address: addressId,
     items: itemsWithPrice,
     totalPrice,
     status: "pending",
