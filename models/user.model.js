@@ -44,6 +44,14 @@ const userSchema = new Schema(
     resetPasswordExpiresAt: String,
     verificationToken: String,
     verificationTokenExpiresAt: String,
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    accountLockedUntil: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

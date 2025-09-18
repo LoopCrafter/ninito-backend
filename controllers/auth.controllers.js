@@ -16,17 +16,26 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 const signup = async (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, name, password,phone } = req.body;
 
   try {
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !phone) {
       throw new Error("All Fields are Required");
     }
+
+    const existPhone = await User.findOne({ phone });
+    if (existPhone) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Phone number already exists" 
+      });
+    }
+
     const existUser = await User.findOne({ email });
     if (existUser) {
       return res
         .status(400)
-        .json({ success: false, message: "user already exists" });
+        .json({ success: false, message: "Email already exists" });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -34,6 +43,7 @@ const signup = async (req, res) => {
     const verificationTokenExpiresAt = getExpiryDate(1);
     const user = new User({
       email,
+      phone,
       password: hashedPassword,
       name,
       verificationToken,
@@ -51,8 +61,11 @@ const signup = async (req, res) => {
         role: undefined,
       },
     });
-  } catch (e) {
-    return res.status(400).json({ message: e.message, success: false });
+  } catch (error) {
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 
@@ -92,7 +105,10 @@ const verifyEmail = async (req, res) => {
       accessToken,
     });
   } catch (e) {
-    res.status(400).json({ message: e.message, success: false });
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 const login = async (req, res) => {
@@ -102,19 +118,34 @@ const login = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid Credential" });
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    if (user.accountLockedUntil && user.accountLockedUntil > Date.now()) {
+      return res.status(423).json({
+        success: false,
+        message: "Account temporarily locked due to too many failed attempts",
+      });
     }
 
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
+      user.failedLoginAttempts += 1;
+
+      if (user.failedLoginAttempts >= 5) {
+        user.accountLockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes
+      }
+      await user.save();
       return res
         .status(400)
-        .json({ success: false, message: "Invalid Credential" });
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     const accessToken = generateAccessToken(res, user._id, user.role);
     generateRefreshTokenAndSetCookie(res, user._id, user.role);
 
+    user.failedLoginAttempts = 0;
+    user.accountLockedUntil = null;
     user.lastLogin = new Date();
     await user.save();
 
@@ -129,7 +160,10 @@ const login = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message, success: false });
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 
@@ -151,7 +185,9 @@ const forgotPassword = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ success: false, message: "User Not found" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User Not found" });
     }
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
@@ -167,7 +203,10 @@ const forgotPassword = async (req, res) => {
       message: "Password Reset Link sent to your Email",
     });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 const resetPassword = async (req, res) => {
@@ -198,14 +237,20 @@ const resetPassword = async (req, res) => {
       message: "Password Reset Successfully",
     });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 
 const refreshAccessToken = async (req, res) => {
   const refreshAccessToken = req.cookies.refreshToken;
   if (!refreshAccessToken) {
-    return res.status(401).json({ message: "Refresh token not found" });
+    return res.status(401).json({ 
+      success: false, 
+      message: "Refresh token not found" 
+    });
   }
 
   try {
@@ -218,7 +263,11 @@ const refreshAccessToken = async (req, res) => {
       decodedToken.userId,
       decodedToken.userRole
     );
-    res.status(200).json({ message: "Access token refreshed", accessToken });
+    res.status(200).json({ 
+      success: true, 
+      message: "Access token refreshed", 
+      accessToken 
+    });
   } catch (error) {
     res
       .status(401)

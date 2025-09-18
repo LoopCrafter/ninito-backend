@@ -10,14 +10,14 @@ import {
   userInfo,
 } from "../controllers/auth.controllers.js";
 import { body } from "express-validator";
-import { loginLimiter, requireAuth } from "../middlewares/auth.middleware.js";
+import { loginLimiter,signupLimiter, requireAuth } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 
 const router = Router();
 
 router.post(
   "/signup",
-  loginLimiter,
+  signupLimiter,
   [
     body("email").isEmail().withMessage("Email is not valid"),
     body("phone").isMobilePhone("fa-IR").withMessage("شماره موبایل معتبر نیست"),
