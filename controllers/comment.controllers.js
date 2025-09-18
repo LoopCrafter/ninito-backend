@@ -15,7 +15,7 @@ const createComment = async (req, res) => {
       }
       product.comments.push(comment._id);
       await product.save();
-      return res.json({ message: "New comment created" });
+      return res.json({ message: "New comment created", success: true });
     }
   } catch (error) {
     console.error(error);

@@ -16,7 +16,6 @@ export const resizeImage = (uploadPath) => async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error resizing image:", err);
-    return res.status(500).json({ msg: "Image processing failed" });
+    return res.status(500).json({ msg: "Image processing failed", success: false });
   }
 };

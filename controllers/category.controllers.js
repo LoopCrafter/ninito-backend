@@ -17,7 +17,7 @@ const createCategory = async (req, res) => {
     });
     return res.status(201).json({ success: true, category: category._doc });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message, success: false });
   }
 };
 const getCategories = async (req, res) => {
