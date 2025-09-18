@@ -3,7 +3,6 @@ import { Settings } from "../models/settings.model.js";
 const getSettings = async (req, res) => {
   try {
     const settings = await Settings.findOne();
-    console.log("+++settings", settings);
     if (!settings) {
       return res
         .status(404)

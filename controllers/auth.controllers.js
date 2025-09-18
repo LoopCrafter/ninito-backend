@@ -1,4 +1,5 @@
 import {
+  SendResetSuccessEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
   sentPasswordResetEmail,
@@ -51,7 +52,7 @@ const signup = async (req, res) => {
       },
     });
   } catch (e) {
-    return res.status(400).json({ message: e.message });
+    return res.status(400).json({ message: e.message, success: false });
   }
 };
 
@@ -76,7 +77,7 @@ const verifyEmail = async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save();
-    await sendWelcomeEmail(user.email, user.name, "https://hamed.cloud");
+    await sendWelcomeEmail(user.email, user.name, process.env.CLIENT_URL);
     //jwt
     const accessToken = generateAccessToken(res, user._id, user.role);
     generateRefreshTokenAndSetCookie(res, user._id, user.role);
@@ -91,7 +92,7 @@ const verifyEmail = async (req, res) => {
       accessToken,
     });
   } catch (e) {
-    res.status(400).json({ message: e.message });
+    res.status(400).json({ message: e.message, success: false });
   }
 };
 const login = async (req, res) => {
@@ -128,7 +129,6 @@ const login = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).json({ message: error.message, success: false });
   }
 };
@@ -151,7 +151,7 @@ const forgotPassword = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.send(400).json({ success: false, message: "User Not found" });
+      return res.status(400).json({ success: false, message: "User Not found" });
     }
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;

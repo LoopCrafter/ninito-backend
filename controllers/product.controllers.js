@@ -19,7 +19,6 @@ const createNewProduct = async (req, res) => {
       : [];
     const parsedColors = colors ? JSON.parse(colors) : [];
     const parsedSizes = sizes ? JSON.parse(sizes) : [];
-    console.log(parsedSizes, sizes);
     const product = await Product.create({
       title,
       category,
@@ -163,10 +162,7 @@ const deleteProductById = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  // const errors = validationResult(req.body);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).json({ success: false, errors: errors.array() });
-  // }
+  
   const { productId } = req.params;
   try {
     const { title, category, price, discount, sizes, colors, description } =
@@ -177,7 +173,7 @@ const updateProduct = async (req, res) => {
 
     const updateData = {
       title,
-      categoryId: category.id, // اصلاح به categoryId
+      categoryId: category.id,
       price,
       discount: parsedDiscount,
       sizes: parsedSizes,

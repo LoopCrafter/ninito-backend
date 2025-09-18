@@ -14,7 +14,6 @@ const createComment = async (req, res) => {
         return res.status(404).json({ message: "Product not found" });
       }
       product.comments.push(comment._id);
-      console.log(product);
       await product.save();
       return res.json({ message: "New comment created" });
     }

@@ -34,7 +34,7 @@ const ProductSchema = new Schema(
   { timestamps: true }
 );
 
-productSchema.virtual("variantsWithFinalPrice").get(function () {
+ProductSchema.virtual("variantsWithFinalPrice").get(function () {
   if (!this.variants || this.variants.length === 0) return [];
 
   return this.variants.map((variant) => {

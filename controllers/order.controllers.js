@@ -9,7 +9,7 @@ const createOrder = async (req, res) => {
   if (!addressId && !newAddress) {
     return res
       .status(400)
-      .json({ message: "Either addressId or address must be provided" });
+      .json({ message: "Either addressId or address must be provided", success: false });
   }
   if (newAddress) {
     const { title, address, city, province, postalCode, totalPrice } =

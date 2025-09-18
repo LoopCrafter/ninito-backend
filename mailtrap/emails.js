@@ -20,9 +20,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
       category: "Email verification",
     });
 
-    console.log("ایمیل تأیید با موفقیت ارسال شد", response);
   } catch (error) {
-    console.log(error);
     throw new Error(`خطا در ارسال کد تأیید: ${error}`);
   }
 };
@@ -41,9 +39,7 @@ export const sendWelcomeEmail = async (email, username, appUrl) => {
       category: "Welcome email",
     });
 
-    console.log("ایمیل خوشامدگویی با موفقیت ارسال شد", response);
   } catch (error) {
-    console.log(error);
     throw new Error(`خطا در ارسال ایمیل خوشامدگویی: ${error}`);
   }
 };
@@ -59,9 +55,7 @@ export const sentPasswordResetEmail = async (email, resetUrl) => {
       category: "Password Reset",
     });
 
-    console.log("ایمیل بازیابی رمز عبور با موفقیت ارسال شد", response);
   } catch (error) {
-    console.log(error);
     throw new Error(`خطا در ارسال ایمیل بازیابی رمز عبور: ${error}`);
   }
 };
@@ -77,9 +71,7 @@ export const SendResetSuccessEmail = async (email) => {
       category: "Password Reset",
     });
 
-    console.log("ایمیل تغییر موفق رمز عبور ارسال شد", response);
   } catch (error) {
-    console.log(error);
     throw new Error(`خطا در ارسال ایمیل تغییر رمز عبور: ${error}`);
   }
 };
