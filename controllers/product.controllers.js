@@ -100,12 +100,12 @@ const getAllProducts = async (req, res) => {
         .sort(selectedSort)
         .skip(skip)
         .limit(limit)
-        .populate("category", "title image id")
-        .populate({
-          path: "comments",
-          select: "productId text userId",
-          populate: { path: "userId", select: "name email" },
-        }),
+        .populate("category", "title image id"),
+      // .populate({
+      //   path: "comments",
+      //   select: "productId text userId",
+      //   populate: { path: "userId", select: "name email" },
+      // }),
 
       Product.countDocuments(conditions),
     ]);

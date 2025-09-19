@@ -6,7 +6,10 @@ const productValidations = [
     .notEmpty()
     .isMongoId()
     .withMessage("شناسه دسته‌بندی معتبر نیست"),
-  body("price").isFloat({ gt: 0 }).withMessage("قیمت باید بزرگ‌تر از صفر باشد"),
+  body("price")
+    .optional()
+    .isFloat({ gt: 0 })
+    .withMessage("قیمت باید بزرگ‌تر از صفر باشد"),
   body("discount.method")
     .optional()
     .isIn(["percentage", "fixed"])
