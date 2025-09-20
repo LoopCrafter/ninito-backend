@@ -100,12 +100,12 @@ const getAllProducts = async (req, res) => {
         .sort(selectedSort)
         .skip(skip)
         .limit(limit)
-        .populate("category", "title image id"),
-      // .populate({
-      //   path: "comments",
-      //   select: "productId text userId",
-      //   populate: { path: "userId", select: "name email" },
-      // }),
+        .populate("category", "title image id")
+        .populate({
+          path: "comments",
+          select: "productId text userId",
+          populate: { path: "userId", select: "name email" },
+        }),
 
       Product.countDocuments(conditions),
     ]);
@@ -186,10 +186,45 @@ const deleteProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { productId } = req.params;
   try {
-    const { title, category, variants, basePrice, discount, description } =
-      req.body;
+    const {
+      title,
+      category,
+      variants,
+      basePrice,
+      discount,
+      description,
+      removeThumbnail,
+      removeGallery,
+    } = req.body;
+
     const parsedVariants = variants ? JSON.parse(variants) : undefined;
     const parsedDiscount = discount ? JSON.parse(discount) : undefined;
+
+    // Parse arrays for removal
+    const parsedRemoveGallery = removeGallery ? JSON.parse(removeGallery) : [];
+
+    // Convert full URLs to relative paths for comparison
+    const normalizedRemoveGallery = parsedRemoveGallery.map((url) => {
+      if (url.includes("http://") || url.includes("https://")) {
+        // Extract path from full URL
+        const urlObj = new URL(url);
+        return urlObj.pathname;
+      }
+      return url;
+    });
+
+    console.log("req.files:", req.files);
+    console.log("removeThumbnail:", removeThumbnail);
+    console.log("removeGallery:", parsedRemoveGallery);
+
+    // Get current product to handle file updates
+    const currentProduct = await Product.findById(productId);
+    if (!currentProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "محصول یافت نشد",
+      });
+    }
 
     const updateData = {
       title,
@@ -200,7 +235,29 @@ const updateProduct = async (req, res) => {
       description,
     };
 
-    // Remove undefined values
+    if (req.files?.thumbnail) {
+      updateData.thumbnail = `/uploads/products/${req.files.thumbnail[0].filename}`;
+    } else if (removeThumbnail === "true") {
+      updateData.thumbnail = null;
+    }
+
+    if (req.files?.gallery) {
+      const newGalleryImages = req.files.gallery.map(
+        (f) => `/uploads/products/${f.filename}`
+      );
+
+      const existingGallery = currentProduct.gallery || [];
+      const filteredExisting = existingGallery.filter(
+        (img) => !normalizedRemoveGallery.includes(img)
+      );
+      updateData.gallery = [...filteredExisting, ...newGalleryImages];
+    } else if (normalizedRemoveGallery.length > 0) {
+      const existingGallery = currentProduct.gallery || [];
+      updateData.gallery = existingGallery.filter(
+        (img) => !normalizedRemoveGallery.includes(img)
+      );
+    }
+
     Object.keys(updateData).forEach((key) => {
       if (updateData[key] === undefined) {
         delete updateData[key];
@@ -211,13 +268,6 @@ const updateProduct = async (req, res) => {
       new: true,
       runValidators: true,
     });
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "محصول یافت نشد",
-      });
-    }
 
     res.json({
       success: true,
