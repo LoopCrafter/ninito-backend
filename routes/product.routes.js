@@ -42,7 +42,6 @@ router.patch(
   requireAuth,
   authorizeRoles("admin"),
   uploadMiddleware,
-  // productValidations,
   updateProduct
 );
 

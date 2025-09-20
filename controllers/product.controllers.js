@@ -4,8 +4,15 @@ import { Comment } from "../models/comment.model.js";
 
 const createNewProduct = async (req, res) => {
   try {
-    const { title, category, variants, basePrice, discount, description } =
-      req.body;
+    const {
+      title,
+      category,
+      variants,
+      basePrice,
+      discount,
+      description,
+      isFeatured,
+    } = req.body;
 
     const thumbnail = req.files?.thumbnail
       ? `/uploads/products/${req.files.thumbnail[0].filename}`
@@ -35,6 +42,7 @@ const createNewProduct = async (req, res) => {
       description,
       thumbnail,
       gallery,
+      isFeatured: !!isFeatured,
     });
     return res.status(201).json({ success: true, product });
   } catch (error) {
@@ -195,29 +203,22 @@ const updateProduct = async (req, res) => {
       description,
       removeThumbnail,
       removeGallery,
+      isFeatured,
     } = req.body;
 
     const parsedVariants = variants ? JSON.parse(variants) : undefined;
     const parsedDiscount = discount ? JSON.parse(discount) : undefined;
 
-    // Parse arrays for removal
     const parsedRemoveGallery = removeGallery ? JSON.parse(removeGallery) : [];
 
-    // Convert full URLs to relative paths for comparison
     const normalizedRemoveGallery = parsedRemoveGallery.map((url) => {
       if (url.includes("http://") || url.includes("https://")) {
-        // Extract path from full URL
         const urlObj = new URL(url);
         return urlObj.pathname;
       }
       return url;
     });
 
-    console.log("req.files:", req.files);
-    console.log("removeThumbnail:", removeThumbnail);
-    console.log("removeGallery:", parsedRemoveGallery);
-
-    // Get current product to handle file updates
     const currentProduct = await Product.findById(productId);
     if (!currentProduct) {
       return res.status(404).json({
@@ -233,6 +234,7 @@ const updateProduct = async (req, res) => {
       basePrice: basePrice ? parseFloat(basePrice) : undefined,
       discount: parsedDiscount,
       description,
+      isFeatured: !!isFeatured,
     };
 
     if (req.files?.thumbnail) {
