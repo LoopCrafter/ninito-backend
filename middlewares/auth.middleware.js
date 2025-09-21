@@ -17,6 +17,9 @@ const signupLimiter = rateLimit({
 });
 
 const requireAuth = (req, res, next) => {
+  console.log("+++ headers:", req.headers);
+  console.log("+++ body:", req.body);
+  console.log("+++ path:", req.path);
   if (!req.headers.authorization) {
     return res.status(401).json({
       success: false,
