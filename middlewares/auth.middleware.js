@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
 import rateLimit from "express-rate-limit";
 import jwt from "jsonwebtoken";
+import { User } from "../models/user.model.js";
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -16,10 +17,7 @@ const signupLimiter = rateLimit({
   message: "Too many signup attempts, please try again later.",
 });
 
-const requireAuth = (req, res, next) => {
-  console.log("+++ headers:", req.headers);
-  console.log("+++ body:", req.body);
-  console.log("+++ path:", req.path);
+const requireAuth = async (req, res, next) => {
   if (!req.headers.authorization) {
     return res.status(401).json({
       success: false,
@@ -36,8 +34,9 @@ const requireAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userRole = decoded.userRole;
     req.userId = decoded.userId;
+    const user = await User.findById(req.userId).select("role");
+    req.userRole = user.role;
     next();
   } catch (err) {
     return res.status(401).json({

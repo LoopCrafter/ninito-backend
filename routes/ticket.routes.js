@@ -7,6 +7,7 @@ import {
 } from "../controllers/ticket.controllers.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { body } from "express-validator";
+import { validate } from "../middlewares/validate.middleware.js";
 const router = Router();
 
 router.post(
@@ -16,11 +17,13 @@ router.post(
     body("subject").notEmpty().withMessage("Subject is required"),
     body("message").notEmpty().withMessage("Message is required"),
   ],
+  validate,
   createNewTicket
 );
+
 router.get("/", requireAuth, getAllTickets);
 
 router.patch("/:ticketId", requireAuth, updateTicket);
-router.delete("/:ticketId", requireAuth("admin"), deleteTicket);
+router.delete("/:ticketId", requireAuth, deleteTicket);
 
 export default router;
