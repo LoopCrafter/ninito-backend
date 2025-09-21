@@ -3,6 +3,7 @@ import {
   createNewTicket,
   deleteTicket,
   getAllTickets,
+  getTicketDetails,
   updateTicket,
 } from "../controllers/ticket.controllers.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
@@ -22,8 +23,15 @@ router.post(
 );
 
 router.get("/", requireAuth, getAllTickets);
+router.get("/:ticketId", requireAuth, getTicketDetails);
 
-router.patch("/:ticketId", requireAuth, updateTicket);
+router.patch(
+  "/:ticketId",
+  [body("message").notEmpty().withMessage("Message is required")],
+  validate,
+  requireAuth,
+  updateTicket
+);
 router.delete("/:ticketId", requireAuth, deleteTicket);
 
 export default router;

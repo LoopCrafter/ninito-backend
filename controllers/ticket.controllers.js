@@ -9,18 +9,28 @@ const createNewTicket = async (req, res) => {
   try {
     session = await mongoose.startSession();
     session.startTransaction();
-    const newTicket = await Ticket.create({ user, subject, status: "open" });
+    const newTicket = await Ticket.create(
+      { user, subject, status: "open" },
+      { session }
+    );
 
-    const newMessage = await TicketMessage.create({
-      ticket: newTicket._id,
-      message: message.trim(),
-      sender: user,
-      attachments: [],
-    });
+    await TicketMessage.create(
+      {
+        ticket: newTicket._id,
+        message: message.trim(),
+        sender: user,
+        attachments: [],
+      },
+      { session }
+    );
     session.commitTransaction();
     session.endSession();
     return res.status(201).json({ success: true, newTicket });
   } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
     res.status(500).json({
       message: "Server error",
       success: false,
@@ -51,12 +61,103 @@ const getAllTickets = async (req, res) => {
   }
 };
 
-const updateTicket = (req, res) => {
-  res.send(`Update ticket with ID ${req.params.ticketId}`);
+const getTicketDetails = async (req, res) => {
+  const { ticketId } = req.params;
+  try {
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+        success: false,
+      });
+    }
+    const messages = await TicketMessage.find({ ticket: ticketId })
+      .sort({ createdAt: 1 })
+      .populate("sender", "name email role");
+
+    res.status(200).json({ success: true, messages });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      success: false,
+    });
+  }
+};
+
+const updateTicket = async (req, res) => {
+  const { ticketId } = req.params;
+  const { message } = req.body;
+  const user = req.userId;
+  let session;
+
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+    if (!ticketId || !message || !req.userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ticketId, message or userId missing",
+      });
+    }
+    const newMessage = await TicketMessage.create(
+      [
+        {
+          ticket: ticketId,
+          message: message.trim(),
+          sender: req.userId,
+          attachments: [],
+        },
+      ],
+      { session }
+    );
+
+    console.log("DEBUG:", {
+      newMessage,
+      ticket: ticketId,
+      message: message.trim(),
+      sender: user,
+      attachments: [],
+    });
+    const ticket = await Ticket.findById(ticketId).session(session);
+    if (!ticket) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    ticket.status = "open";
+    await ticket.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      newMessage: newMessage[0],
+    });
+  } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
 };
 
 const deleteTicket = (req, res) => {
   res.send(`Delete ticket with ID ${req.params.ticketId}`);
 };
 
-export { createNewTicket, getAllTickets, updateTicket, deleteTicket };
+export {
+  createNewTicket,
+  getAllTickets,
+  updateTicket,
+  deleteTicket,
+  getTicketDetails,
+};
