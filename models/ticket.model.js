@@ -11,23 +11,6 @@ const TicketSchema = new Schema(
       type: String,
       required: true,
     },
-    messages: [
-      {
-        sender: {
-          type: String,
-          enum: ["user", "admin"],
-          required: true,
-        },
-        message: {
-          type: String,
-          required: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
     status: {
       type: String,
       enum: ["open", "inProgress", "answered", "closed"],
@@ -36,3 +19,5 @@ const TicketSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export const Ticket = model("Ticket", TicketSchema);
