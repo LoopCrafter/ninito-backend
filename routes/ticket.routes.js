@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  closeTicket,
   createNewTicket,
   deleteTicket,
   getAllTickets,
@@ -7,7 +8,7 @@ import {
   updateTicket,
 } from "../controllers/ticket.controllers.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { validate } from "../middlewares/validate.middleware.js";
 const router = Router();
 
@@ -33,5 +34,13 @@ router.patch(
   updateTicket
 );
 router.delete("/:ticketId", requireAuth, deleteTicket);
+
+router.post(
+  "/:ticketId/close",
+  requireAuth,
+  [param("ticketId").isMongoId().withMessage("Invalid ticket ID")],
+  validate,
+  closeTicket
+);
 
 export default router;

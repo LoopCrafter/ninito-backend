@@ -78,7 +78,7 @@ const getTicketDetails = async (req, res) => {
       .sort({ createdAt: 1 })
       .populate("sender", "name email role");
 
-    res.status(200).json({ success: true, messages });
+    res.status(200).json({ success: true, messages, status: ticket.status });
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -145,10 +145,34 @@ const deleteTicket = (req, res) => {
   res.send(`Delete ticket with ID ${req.params.ticketId}`);
 };
 
+const closeTicket = async (req, res) => {
+  const { ticketId } = req.params;
+  try {
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+        success: false,
+      });
+    }
+    ticket.status = "closed";
+    await ticket.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Ticket closed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      success: false,
+    });
+  }
+};
+
 export {
   createNewTicket,
   getAllTickets,
   updateTicket,
   deleteTicket,
   getTicketDetails,
+  closeTicket,
 };
