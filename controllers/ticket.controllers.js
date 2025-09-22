@@ -6,26 +6,28 @@ const createNewTicket = async (req, res) => {
   const user = req.userId;
   const { subject, message } = req.body;
   let session;
+
   try {
     session = await mongoose.startSession();
     session.startTransaction();
-    const newTicket = await Ticket.create(
-      { user, subject, status: "open" },
-      { session }
-    );
-
+    const newTicket = await Ticket.create([{ user, subject, status: "open" }], {
+      session,
+    });
+    console.log("New Ticket:", newTicket);
     await TicketMessage.create(
-      {
-        ticket: newTicket._id,
-        message: message.trim(),
-        sender: user,
-        attachments: [],
-      },
+      [
+        {
+          ticket: newTicket[0]._id,
+          message: message.trim(),
+          sender: user,
+          attachments: [],
+        },
+      ],
       { session }
     );
     session.commitTransaction();
     session.endSession();
-    return res.status(201).json({ success: true, newTicket });
+    return res.status(201).json({ success: true, ticket: newTicket[0] });
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -34,6 +36,7 @@ const createNewTicket = async (req, res) => {
     res.status(500).json({
       message: "Server error",
       success: false,
+      message: error.message,
     });
   }
 };
@@ -111,21 +114,9 @@ const updateTicket = async (req, res) => {
       { session }
     );
 
-    console.log("DEBUG:", {
-      newMessage,
-      ticket: ticketId,
-      message: message.trim(),
-      sender: user,
-      attachments: [],
-    });
     const ticket = await Ticket.findById(ticketId).session(session);
     if (!ticket) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({
-        success: false,
-        message: "Ticket not found",
-      });
+      throw new Error("Ticket not found");
     }
 
     ticket.status = "open";

@@ -23,7 +23,7 @@ router.post(
 );
 
 router.get("/", requireAuth, getAllTickets);
-router.get("/:ticketId", requireAuth, getTicketDetails);
+router.get("/:ticketId/messages", requireAuth, getTicketDetails);
 
 router.patch(
   "/:ticketId",
