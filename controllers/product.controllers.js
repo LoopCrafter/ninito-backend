@@ -1,5 +1,11 @@
 import { Product } from "../models/product.model.js";
 
+const parseBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value.toLowerCase() === "true";
+  return false;
+};
+
 const createNewProduct = async (req, res) => {
   try {
     const {
@@ -69,6 +75,10 @@ const getAllProducts = async (req, res) => {
         { "variants.stock": { $gt: 0 } },
         { baseStock: { $gt: 0 } },
       ];
+    }
+
+    if (req.userRole !== "admin") {
+      conditions.isEnabled = true;
     }
 
     // Filter by price range
@@ -203,6 +213,7 @@ const updateProduct = async (req, res) => {
       removeThumbnail,
       removeGallery,
       isFeatured,
+      isEnabled,
     } = req.body;
 
     const parsedVariants = variants ? JSON.parse(variants) : undefined;
@@ -225,7 +236,6 @@ const updateProduct = async (req, res) => {
         message: "محصول یافت نشد",
       });
     }
-
     const updateData = {
       title,
       category,
@@ -233,7 +243,8 @@ const updateProduct = async (req, res) => {
       basePrice: basePrice ? parseFloat(basePrice) : undefined,
       discount: parsedDiscount,
       description,
-      isFeatured: !!isFeatured,
+      isFeatured: parseBoolean(isFeatured) && parseBoolean(isEnabled),
+      isEnabled: parseBoolean(isEnabled),
     };
 
     if (req.files?.thumbnail) {

@@ -30,6 +30,7 @@ router.post(
 );
 
 router.get("/", getAllProducts);
+router.get("/admin", requireAuth, authorizeRoles("admin"), getAllProducts);
 router.get("/:productId", getProductById);
 router.delete(
   "/:productId",
