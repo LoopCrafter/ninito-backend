@@ -6,6 +6,7 @@ const ProductSchema = new Schema(
     title: String,
     category: { type: Schema.Types.ObjectId, ref: "Category" },
     isFeatured: { type: Boolean, default: false },
+    isEnabled: { type: Boolean, default: true },
     variants: [
       {
         size: { type: String, enum: ["XS", "S", "M", "L", "XL"] },

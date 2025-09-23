@@ -1,6 +1,4 @@
-import { validationResult } from "express-validator";
 import { Product } from "../models/product.model.js";
-import { Comment } from "../models/comment.model.js";
 
 const createNewProduct = async (req, res) => {
   try {
@@ -103,7 +101,7 @@ const getAllProducts = async (req, res) => {
     };
     sortOptions[sort] = order === "asc" ? 1 : -1;
     const selectedSort = sortOptions[req.query.sortBy] || { createdAt: -1 };
-    const [products, total] = await Promise.all([
+    const [products, featuredProducts, total] = await Promise.all([
       Product.find(conditions)
         .sort(selectedSort)
         .skip(skip)
@@ -114,7 +112,7 @@ const getAllProducts = async (req, res) => {
           select: "productId text userId",
           populate: { path: "userId", select: "name email" },
         }),
-
+      Product.find({ isFeatured: true }),
       Product.countDocuments(conditions),
     ]);
 
@@ -132,6 +130,7 @@ const getAllProducts = async (req, res) => {
       prevPage: page > 1 ? page - 1 : null,
       lastPage: totalPages,
       products,
+      featured: featuredProducts,
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
