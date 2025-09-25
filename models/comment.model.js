@@ -15,6 +15,12 @@ const CommentSchema = new Schema({
     type: String,
     required: true,
   },
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5,
+  },
   replies: [
     {
       userId: {
@@ -37,5 +43,7 @@ const CommentSchema = new Schema({
     default: Date.now,
   },
 });
+
+ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 export const Comment = model("Comment", CommentSchema);
