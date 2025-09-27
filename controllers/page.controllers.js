@@ -42,10 +42,12 @@ const getAllPages = async (req, res) => {
     const totalPages = Math.ceil(total / limit);
 
     res.status(200).json({
-      message: "Pages fetched successfully",
       success: true,
-      pages,
+      page,
+      limit,
       total,
+      pages,
+      totalPages,
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
       nextPage: page < totalPages ? page + 1 : null,
