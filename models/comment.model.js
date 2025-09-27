@@ -44,6 +44,6 @@ const CommentSchema = new Schema({
   },
 });
 
-ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
+CommentSchema.index({ product: 1, user: 1 }, { unique: true });
 
 export const Comment = model("Comment", CommentSchema);

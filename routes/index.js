@@ -11,7 +11,7 @@ import addressRoutes from "./address.routes.js";
 import userRoutes from "./user.routes.js";
 import orderRoutes from "./order.routes.js";
 import ticketRoutes from "./ticket.routes.js";
-
+import pageRouters from "./page.routes.js";
 const router = Router();
 const BASE_PATH = "/api/v1";
 
@@ -27,5 +27,6 @@ router.use(`${BASE_PATH}/addresses`, addressRoutes);
 router.use(`${BASE_PATH}/users`, userRoutes);
 router.use(`${BASE_PATH}/orders`, orderRoutes);
 router.use(`${BASE_PATH}/tickets`, ticketRoutes);
+router.use(`${BASE_PATH}/pages`, pageRouters);
 
 export default router;
