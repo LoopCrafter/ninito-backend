@@ -16,6 +16,7 @@ const PageSchema = new Schema(
       required: true,
     },
     metaTitle: String,
+    metaKeywords: String,
     metaDescription: String,
     createdBy: {
       type: Schema.Types.ObjectId,

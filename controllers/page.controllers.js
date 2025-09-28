@@ -24,7 +24,7 @@ const createPage = async (req, res) => {
 };
 const getAllPages = async (req, res) => {
   try {
-    let { search = "", order = "asc", page = 1, limit = 5 } = req.query;
+    let { search = "", order = "desc", page = 1, limit = 5 } = req.query;
     const skip = (page - 1) * limit;
     const conditions = {};
 
