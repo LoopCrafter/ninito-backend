@@ -26,4 +26,14 @@ const PageSchema = new Schema(
   { timestamps: true }
 );
 
+PageSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  },
+});
+
 export const Page = model("Page", PageSchema);
