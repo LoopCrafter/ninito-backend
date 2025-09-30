@@ -34,6 +34,8 @@ export function applyDefaultTransforms(schema, hiddenFields = []) {
       delete ret[field];
     });
     delete ret.__v;
+    ret.id = ret._id;
+    delete ret._id;
     return ret;
   }
 

@@ -215,7 +215,6 @@ const updateProduct = async (req, res) => {
       isFeatured,
       isEnabled,
     } = req.body;
-
     const parsedVariants = variants ? JSON.parse(variants) : undefined;
     const parsedDiscount = discount ? JSON.parse(discount) : undefined;
 
