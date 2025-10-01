@@ -8,6 +8,12 @@ export const generateAccessToken = (res, userId, userRole) => {
     expiresIn: "30m",
   });
 
+  res.cookie("accessToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000,
+  });
   return token;
 };
 export const generateRefreshTokenAndSetCookie = (res, userId, userRole) => {
@@ -19,7 +25,6 @@ export const generateRefreshTokenAndSetCookie = (res, userId, userRole) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    // sameSite: "none",
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 };

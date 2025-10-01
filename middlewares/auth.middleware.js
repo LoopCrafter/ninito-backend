@@ -18,31 +18,69 @@ const signupLimiter = rateLimit({
 });
 
 const requireAuth = async (req, res, next) => {
-  if (!req.headers.authorization) {
+  let token;
+
+  if (req.cookies && req.cookies.accessToken) {
+    token = req.cookies.accessToken;
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else {
     return res.status(401).json({
       success: false,
-      message: "No token, unauthorized",
+      message: "No token provided, unauthorized",
     });
   }
-  const token = req.headers.authorization?.split(" ")[1];
+
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: "No token, unauthorized",
+      message: "Invalid token format",
     });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
-    const user = await User.findById(req.userId).select("role");
+
+    const user = await User.findById(req.userId).select("role").lean();
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const validRoles = ["user", "admin"];
+    if (!validRoles.includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid user role",
+      });
+    }
+
     req.userRole = user.role;
     next();
   } catch (err) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token",
-    });
+    // distinguish error types
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token expired - please refresh",
+      });
+    } else if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token signature",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "Server error in authentication",
+      });
+    }
   }
 };
 

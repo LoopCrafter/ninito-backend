@@ -16,7 +16,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 const signup = async (req, res) => {
-  const { email, name, password,phone } = req.body;
+  const { email, name, password, phone } = req.body;
 
   try {
     if (!email || !password || !name || !phone) {
@@ -25,9 +25,9 @@ const signup = async (req, res) => {
 
     const existPhone = await User.findOne({ phone });
     if (existPhone) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Phone number already exists" 
+      return res.status(400).json({
+        success: false,
+        message: "Phone number already exists",
       });
     }
 
@@ -62,9 +62,9 @@ const signup = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -105,9 +105,9 @@ const verifyEmail = async (req, res) => {
       accessToken,
     });
   } catch (e) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -160,15 +160,20 @@ const login = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
 
 const logout = async (req, res) => {
   res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
@@ -203,9 +208,9 @@ const forgotPassword = async (req, res) => {
       message: "Password Reset Link sent to your Email",
     });
   } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -237,9 +242,9 @@ const resetPassword = async (req, res) => {
       message: "Password Reset Successfully",
     });
   } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -247,9 +252,9 @@ const resetPassword = async (req, res) => {
 const refreshAccessToken = async (req, res) => {
   const refreshAccessToken = req.cookies.refreshToken;
   if (!refreshAccessToken) {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Refresh token not found" 
+    return res.status(401).json({
+      success: false,
+      message: "Refresh token not found",
     });
   }
 
@@ -263,10 +268,10 @@ const refreshAccessToken = async (req, res) => {
       decodedToken.userId,
       decodedToken.userRole
     );
-    res.status(200).json({ 
-      success: true, 
-      message: "Access token refreshed", 
-      accessToken 
+    res.status(200).json({
+      success: true,
+      message: "Access token refreshed",
+      accessToken,
     });
   } catch (error) {
     res

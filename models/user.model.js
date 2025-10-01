@@ -56,4 +56,13 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+userSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  },
+});
 export const User = model("User", userSchema);
