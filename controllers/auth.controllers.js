@@ -167,7 +167,7 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
 };
@@ -206,7 +206,7 @@ const forgotPassword = async (req, res) => {
     await user.save();
 
     //email
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${resetToken}`;
     await sentPasswordResetEmail(user.email, resetUrl);
     res.status(200).json({
       success: true,
@@ -215,7 +215,7 @@ const forgotPassword = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
 };
