@@ -16,7 +16,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    name: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
@@ -39,6 +43,10 @@ const userSchema = new Schema(
       type: String,
       enum: ["user", "admin", "moderator"],
       default: "user",
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female", "prefer_not_to_say"],
     },
     resetPasswordToken: String,
     resetPasswordExpiresAt: String,

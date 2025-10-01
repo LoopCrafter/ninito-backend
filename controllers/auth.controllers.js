@@ -16,10 +16,10 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 const signup = async (req, res) => {
-  const { email, name, password, phone } = req.body;
+  const { email, firstName, password, phone, gender, lastName } = req.body;
 
   try {
-    if (!email || !password || !name || !phone) {
+    if (!email || !password || !firstName || !phone) {
       throw new Error("All Fields are Required");
     }
 
@@ -45,7 +45,9 @@ const signup = async (req, res) => {
       email,
       phone,
       password: hashedPassword,
-      name,
+      firstName,
+      lastName,
+      gender,
       verificationToken,
       verificationTokenExpiresAt,
       role: "user",
@@ -64,7 +66,7 @@ const signup = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
 };
@@ -156,6 +158,9 @@ const login = async (req, res) => {
         ...user._doc,
         password: undefined,
         role: undefined,
+        verificationToken: undefined,
+        verificationTokenExpiresAt: undefined,
+        accountLockedUntil: undefined,
       },
       accessToken,
     });
