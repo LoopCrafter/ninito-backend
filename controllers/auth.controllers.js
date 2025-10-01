@@ -20,14 +20,14 @@ const signup = async (req, res) => {
 
   try {
     if (!email || !password || !firstName || !phone) {
-      throw new Error("All Fields are Required");
+      throw new Error("تمام فیلدها الزامی هستند");
     }
 
     const existPhone = await User.findOne({ phone });
     if (existPhone) {
       return res.status(400).json({
         success: false,
-        message: "Phone number already exists",
+        message: "شماره تلفن قبلاً ثبت شده است",
       });
     }
 
@@ -35,7 +35,7 @@ const signup = async (req, res) => {
     if (existUser) {
       return res
         .status(400)
-        .json({ success: false, message: "Email already exists" });
+        .json({ success: false, message: "ایمیل قبلاً ثبت شده است" });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -66,7 +66,7 @@ const signup = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: error.message || "خطای داخلی سرور",
     });
   }
 };
@@ -75,7 +75,7 @@ const verifyEmail = async (req, res) => {
   const { code } = req.body;
   try {
     if (!code) {
-      throw new Error("Verification token is Required!");
+      throw new Error("کد تأیید الزامی است!");
     }
     const user = await User.findOne({
       verificationToken: code,
@@ -85,7 +85,7 @@ const verifyEmail = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or Expired verification code!",
+        message: "کد تأیید نامعتبر یا منقضی شده است!",
       });
     }
     user.isVerified = true;
@@ -98,7 +98,7 @@ const verifyEmail = async (req, res) => {
     generateRefreshTokenAndSetCookie(res, user._id, user.role);
     res.status(200).json({
       success: true,
-      message: "Email Verified Successfully",
+      message: "ایمیل با موفقیت تأیید شد",
       user: {
         ...user._doc,
         password: undefined,
@@ -109,7 +109,7 @@ const verifyEmail = async (req, res) => {
   } catch (e) {
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "خطای داخلی سرور",
     });
   }
 };
@@ -120,13 +120,13 @@ const login = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+        .json({ success: false, message: "اطلاعات ورود نامعتبر است" });
     }
 
     if (user.accountLockedUntil && user.accountLockedUntil > Date.now()) {
       return res.status(423).json({
         success: false,
-        message: "Account temporarily locked due to too many failed attempts",
+        message: "حساب کاربری به دلیل تلاش‌های ناموفق موقتاً قفل شده است",
       });
     }
 
@@ -135,12 +135,12 @@ const login = async (req, res) => {
       user.failedLoginAttempts += 1;
 
       if (user.failedLoginAttempts >= 5) {
-        user.accountLockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes
+        user.accountLockedUntil = Date.now() + 30 * 60 * 1000;
       }
       await user.save();
       return res
         .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+        .json({ success: false, message: "اطلاعات ورود نامعتبر است" });
     }
 
     const accessToken = generateAccessToken(res, user._id, user.role);
@@ -153,7 +153,7 @@ const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Logged in successfully",
+      message: "ورود با موفقیت انجام شد",
       user: {
         ...user._doc,
         password: undefined,
@@ -167,7 +167,7 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: error.message || "خطای داخلی سرور",
     });
   }
 };
@@ -184,20 +184,20 @@ const logout = async (req, res) => {
     sameSite: "strict",
   });
 
-  res.status(200).json({ success: true, message: "Logged out successfully" });
+  res.status(200).json({ success: true, message: "خروج با موفقیت انجام شد" });
 };
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     if (!email) {
-      throw new Error("Email is required!");
+      throw new Error("ایمیل الزامی است!");
     }
     const user = await User.findOne({ email });
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "User Not found" });
+        .json({ success: false, message: "کاربر یافت نشد" });
     }
     const resetToken = crypto.randomBytes(20).toString("hex");
     const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
@@ -210,12 +210,12 @@ const forgotPassword = async (req, res) => {
     await sentPasswordResetEmail(user.email, resetUrl);
     res.status(200).json({
       success: true,
-      message: "Password Reset Link sent to your Email",
+      message: "لینک بازیابی رمز عبور به ایمیل شما ارسال شد",
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: error.message || "خطای داخلی سرور",
     });
   }
 };
@@ -224,7 +224,7 @@ const resetPassword = async (req, res) => {
   const { password } = req.body;
   try {
     if (!token || !password) {
-      throw new Error("All the fields are Required!");
+      throw new Error("تمام فیلدها الزامی هستند");
     }
     const user = await User.findOne({
       resetPasswordToken: token,
@@ -233,7 +233,10 @@ const resetPassword = async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid or Expired reset Token" });
+        .json({
+          success: false,
+          message: "توکن بازیابی نامعتبر یا منقضی شده است",
+        });
     }
     const hashedPassword = await bcryptjs.hash(password, 10);
     user.password = hashedPassword;
@@ -244,12 +247,12 @@ const resetPassword = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Password Reset Successfully",
+      message: "رمز عبور با موفقیت تغییر کرد",
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "خطای داخلی سرور",
     });
   }
 };
@@ -259,7 +262,7 @@ const refreshAccessToken = async (req, res) => {
   if (!refreshAccessToken) {
     return res.status(401).json({
       success: false,
-      message: "Refresh token not found",
+      message: "رفرش توکن یافت نشد",
     });
   }
 
@@ -275,20 +278,20 @@ const refreshAccessToken = async (req, res) => {
     );
     res.status(200).json({
       success: true,
-      message: "Access token refreshed",
+      message: "توکن دسترسی با موفقیت نوسازی شد",
       accessToken,
     });
   } catch (error) {
     res
       .status(401)
-      .json({ success: false, message: "Invalid or expired refresh token" });
+      .json({ success: false, message: "رفرش توکن نامعتبر یا منقضی شده است" });
   }
 };
 const userInfo = async (req, res) => {
   const { userId } = req;
   const user = await User.findOne({ _id: userId }).select("-password");
   if (!user) {
-    return res.status(400).json({ success: false, message: "User not Found!" });
+    return res.status(400).json({ success: false, message: "کاربر یافت نشد!" });
   }
 
   res.status(200).json({ success: true, user });
