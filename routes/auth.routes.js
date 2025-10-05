@@ -10,7 +10,11 @@ import {
   userInfo,
 } from "../controllers/auth.controllers.js";
 import { body } from "express-validator";
-import { loginLimiter,signupLimiter, requireAuth } from "../middlewares/auth.middleware.js";
+import {
+  loginLimiter,
+  signupLimiter,
+  requireAuth,
+} from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 
 const router = Router();
@@ -46,7 +50,7 @@ router.post(
   validate,
   login
 );
-router.post("/logout", requireAuth, logout);
+router.post("/logout", logout);
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", loginLimiter, forgotPassword);
 router.post("/reset-password/:token", loginLimiter, resetPassword);
