@@ -62,12 +62,22 @@ const getAllProducts = async (req, res) => {
       order = "asc",
       page = 1,
       limit = 5,
-      filter = {},
     } = req.query;
+
+    const filterKeys = Object.keys(req.query).filter((key) =>
+      key.startsWith("filter[")
+    );
+    const filter = {};
+
+    filterKeys.forEach((key) => {
+      const field = key.match(/filter\[(.+)\]/)?.[1];
+      if (field) {
+        filter[field] = req.query[key];
+      }
+    });
 
     const skip = (page - 1) * limit;
     const conditions = {};
-
     if (filter.category) conditions.category = filter.category;
 
     if (filter.inStock) {
@@ -94,6 +104,18 @@ const getAllProducts = async (req, res) => {
         conditions.$or[1].basePrice.$lte = parseInt(filter.maxPrice);
       }
     }
+    if (filter.color) {
+      const colors = Array.isArray(filter.color)
+        ? filter.color
+        : [filter.color];
+
+      conditions.variants = {
+        $elemMatch: {
+          "color.name": { $in: colors },
+          stock: { $gt: 0 },
+        },
+      };
+    }
     if (search) {
       conditions.title = { $regex: search, $options: "i" };
     }
@@ -109,8 +131,7 @@ const getAllProducts = async (req, res) => {
       topRated: { averageRating: -1 },
       featured: { isFeatured: -1, createdAt: -1 },
     };
-    sortOptions[sort] = order === "asc" ? 1 : -1;
-    const selectedSort = sortOptions[req.query.sortBy] || { createdAt: -1 };
+    const selectedSort = sortOptions[req.query.sort] || { createdAt: -1 };
     const [products, featuredProducts, total] = await Promise.all([
       Product.find(conditions)
         .sort(selectedSort)
