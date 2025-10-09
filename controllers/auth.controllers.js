@@ -24,6 +24,7 @@ const signup = async (req, res) => {
     }
 
     const existPhone = await User.findOne({ phone });
+
     if (existPhone) {
       return res.status(400).json({
         success: false,
@@ -231,12 +232,10 @@ const resetPassword = async (req, res) => {
       resetPasswordExpiresAt: { $gt: Date.now() },
     });
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "توکن بازیابی نامعتبر یا منقضی شده است",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "توکن بازیابی نامعتبر یا منقضی شده است",
+      });
     }
     const hashedPassword = await bcryptjs.hash(password, 10);
     user.password = hashedPassword;

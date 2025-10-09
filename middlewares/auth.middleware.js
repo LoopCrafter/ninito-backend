@@ -13,7 +13,7 @@ const loginLimiter = rateLimit({
 
 const signupLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 3,
+  max: 5,
   message: "Too many signup attempts, please try again later.",
 });
 
