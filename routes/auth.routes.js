@@ -8,6 +8,7 @@ import {
   resetPassword,
   refreshAccessToken,
   userInfo,
+  checkAuth,
 } from "../controllers/auth.controllers.js";
 import { body } from "express-validator";
 import {
@@ -56,4 +57,5 @@ router.post("/forgot-password", loginLimiter, forgotPassword);
 router.post("/reset-password/:token", loginLimiter, resetPassword);
 router.post("/refresh-token", loginLimiter, refreshAccessToken);
 router.get("/me", loginLimiter, requireAuth, userInfo);
+router.get("/check-user", requireAuth, checkAuth);
 export default router;

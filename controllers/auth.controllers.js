@@ -145,6 +145,11 @@ const login = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(res, user._id, user.role);
+    const refreshToken = generateRefreshTokenAndSetCookie(
+      res,
+      user._id,
+      user.role
+    );
     generateRefreshTokenAndSetCookie(res, user._id, user.role);
 
     user.failedLoginAttempts = 0;
@@ -164,6 +169,7 @@ const login = async (req, res) => {
         accountLockedUntil: undefined,
       },
       accessToken,
+      refreshToken,
     });
   } catch (error) {
     return res.status(500).json({
@@ -251,7 +257,7 @@ const resetPassword = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "خطای داخلی سرور",
+      message: error.message || "خطای داخلی سرور",
     });
   }
 };
@@ -295,6 +301,27 @@ const userInfo = async (req, res) => {
 
   res.status(200).json({ success: true, user });
 };
+
+const checkAuth = async (req, res) => {
+  const { userId } = req;
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    return res.status(400).json({ success: false, message: "کاربر یافت نشد!" });
+  }
+  res.status(200).json({
+    success: true,
+    user: {
+      ...user._doc,
+      password: undefined,
+      role: undefined,
+      verificationToken: undefined,
+      verificationTokenExpiresAt: undefined,
+      resetPasswordToken: undefined,
+      resetPasswordExpiresAt: undefined,
+      accountLockedUntil: undefined,
+    },
+  });
+};
 export {
   signup,
   logout,
@@ -304,4 +331,5 @@ export {
   resetPassword,
   refreshAccessToken,
   userInfo,
+  checkAuth,
 };
