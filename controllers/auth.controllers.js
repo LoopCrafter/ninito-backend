@@ -144,12 +144,8 @@ const login = async (req, res) => {
         .json({ success: false, message: "اطلاعات ورود نامعتبر است" });
     }
 
-    const accessToken = generateAccessToken(res, user._id, user.role);
-    const refreshToken = generateRefreshTokenAndSetCookie(
-      res,
-      user._id,
-      user.role
-    );
+    generateAccessToken(res, user._id, user.role);
+    generateRefreshTokenAndSetCookie(res, user._id, user.role);
     generateRefreshTokenAndSetCookie(res, user._id, user.role);
 
     user.failedLoginAttempts = 0;
@@ -168,8 +164,6 @@ const login = async (req, res) => {
         verificationTokenExpiresAt: undefined,
         accountLockedUntil: undefined,
       },
-      accessToken,
-      refreshToken,
     });
   } catch (error) {
     return res.status(500).json({
