@@ -72,6 +72,13 @@ const updateProfile = async (req, res) => {
     }
   }
   try {
+    const file = req.file;
+    if (updated.image === null || updated.image === "") {
+      updated.image = undefined;
+    }
+    if (file) {
+      updated.image = `/uploads/categories/${file.filename}`;
+    }
     if (updated?.phone) {
       const existingPhone = await User.findOne({
         phone: updated.phone,
