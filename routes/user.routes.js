@@ -8,6 +8,8 @@ import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { profileValidation } from "../middlewares/user.middleware.js";
 import { resizeImage } from "../middlewares/resize.middleware.js";
+import uploaderManager from "./../utils/FileUploaderManager.js";
+
 const uploadPath = "./uploads/users";
 const router = Router();
 router.get("/", requireAuth, authorizeRoles("admin"), getAllUsers);

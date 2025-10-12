@@ -64,13 +64,29 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+userSchema.virtual("userImage").get(function () {
+  if (!this.image) return null;
+  const baseUrl = process.env.BASEURL || "http://localhost:3000";
+  return `${baseUrl}${this.image.startsWith("/") ? "" : "/"}${this.image}`;
+});
+
+const transformFunction = (doc, ret) => {
+  ret.id = ret._id;
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 userSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
-  transform: function (doc, ret) {
-    ret.id = ret._id;
-    delete ret._id;
-    return ret;
-  },
+  transform: transformFunction,
 });
+
+userSchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: transformFunction,
+});
+
 export const User = model("User", userSchema);

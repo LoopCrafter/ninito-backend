@@ -104,11 +104,12 @@ const updateProfile = async (req, res) => {
       message: "کاربر با موفقیت به روز رسانی شد",
       success: true,
       user: {
-        ...user._doc,
+        ...user.toJSON(),
         password: undefined,
         role: undefined,
         resetPasswordExpiresAt: undefined,
         resetPasswordToken: undefined,
+        image: undefined,
       },
     });
   } catch (error) {
