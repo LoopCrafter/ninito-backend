@@ -16,6 +16,12 @@ const SettingsSchema = new Schema(
     phone: {
       type: String,
     },
+    email: {
+      type: String,
+    },
+    workingHours: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
