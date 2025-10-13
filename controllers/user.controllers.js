@@ -44,11 +44,12 @@ const getProfile = async (req, res) => {
     return res.status(200).json({
       success: true,
       user: {
-        ...user._doc,
+        ...user.toJSON(),
         password: undefined,
         role: undefined,
         resetPasswordExpiresAt: undefined,
         resetPasswordToken: undefined,
+        image: undefined,
       },
     });
   } catch (error) {
@@ -77,7 +78,7 @@ const updateProfile = async (req, res) => {
       updated.image = undefined;
     }
     if (file) {
-      updated.image = `/uploads/categories/${file.filename}`;
+      updated.image = `/uploads/users/${file.filename}`;
     }
     if (updated?.phone) {
       const existingPhone = await User.findOne({

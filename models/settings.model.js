@@ -13,6 +13,9 @@ const SettingsSchema = new Schema(
     notifyNewOrder: { type: Boolean, default: true },
     notifyNewMessage: { type: Boolean, default: true },
     notifyLowStock: { type: Boolean, default: true },
+    phone: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

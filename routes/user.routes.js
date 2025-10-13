@@ -19,7 +19,6 @@ router.patch(
   "/profile",
   profileValidation,
   requireAuth,
-  validate,
   uploaderManager.single(uploadPath, "image"),
   resizeImage(uploadPath),
   updateProfile

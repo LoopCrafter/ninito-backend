@@ -3,6 +3,7 @@ import { connectDB } from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import Routes from "./routes/index.js";
 import cors from "cors";
+import path from "path";
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
 
@@ -16,7 +17,7 @@ app.use(
     credentials: true,
   })
 );
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/", Routes);
 
 const PORT = process.env.PORT || 3000;
