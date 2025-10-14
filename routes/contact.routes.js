@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { CreateContact } from "../controllers/contact.controllers.js";
+import {
+  CreateContact,
+  getAllContacts,
+} from "../controllers/contact.controllers.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import rateLimit from "express-rate-limit";
 import { sanitizeBody } from "../middlewares/sanitizeBody.js";
+import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -38,5 +42,7 @@ router.post(
   validate,
   CreateContact
 );
+
+router.get("/", requireAuth, authorizeRoles("admin"), getAllContacts);
 
 export default router;

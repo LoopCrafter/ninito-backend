@@ -19,4 +19,28 @@ const CreateContact = async (req, res) => {
   }
 };
 
-export { CreateContact };
+const getAllContacts = async (req, res) => {
+  try {
+    const { filter } = req.query;
+    const allowedFilters = [
+      "product-question",
+      "order-support",
+      "complaint",
+      "suggestion",
+      "collaboration",
+      "other",
+    ];
+    const query = allowedFilters.includes(filter) ? { subject: filter } : {};
+
+    const contacts = await Contact.find(query).sort({ createdAt: -1 });
+    res
+      .status(200)
+      .json({ success: true, contacts: contacts.map((c) => c.toJSON()) });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, error: err.message || "server error" });
+  }
+};
+
+export { CreateContact, getAllContacts };
