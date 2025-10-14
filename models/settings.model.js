@@ -13,14 +13,17 @@ const SettingsSchema = new Schema(
     notifyNewOrder: { type: Boolean, default: true },
     notifyNewMessage: { type: Boolean, default: true },
     notifyLowStock: { type: Boolean, default: true },
-    phone: {
-      type: String,
-    },
     email: {
       type: String,
     },
     workingHours: {
       type: String,
+    },
+    socials: {
+      instagram: { type: String },
+      telegram: { type: String },
+      whatsapp: { type: String },
+      facebook: { type: String },
     },
   },
   { timestamps: true }
