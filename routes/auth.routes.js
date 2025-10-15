@@ -9,6 +9,7 @@ import {
   refreshAccessToken,
   userInfo,
   checkAuth,
+  adminLogin,
 } from "../controllers/auth.controllers.js";
 import { body } from "express-validator";
 import {
@@ -41,6 +42,7 @@ router.post(
   validate,
   signup
 );
+
 router.post(
   "/login",
   loginLimiter,
@@ -58,4 +60,16 @@ router.post("/reset-password/:token", loginLimiter, resetPassword);
 router.post("/refresh-token", loginLimiter, refreshAccessToken);
 router.get("/me", loginLimiter, requireAuth, userInfo);
 router.get("/check-user", requireAuth, checkAuth);
+
+router.post(
+  "/admin/login",
+  loginLimiter,
+  [
+    body("email").isEmail().withMessage("Email is not valid"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  validate,
+  adminLogin
+);
+
 export default router;

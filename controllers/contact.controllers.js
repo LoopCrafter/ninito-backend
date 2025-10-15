@@ -10,7 +10,6 @@ const CreateContact = async (req, res) => {
       message,
       phone,
     });
-    console.log("hamed", newContact);
     res.status(201).json({ success: true, contact: newContact });
   } catch (error) {
     res
@@ -21,8 +20,9 @@ const CreateContact = async (req, res) => {
 
 const getAllContacts = async (req, res) => {
   try {
-    const { filter } = req.query;
-    const allowedFilters = [
+    const { subject } = req.query;
+
+    const allowedSubject = [
       "product-question",
       "order-support",
       "complaint",
@@ -30,8 +30,7 @@ const getAllContacts = async (req, res) => {
       "collaboration",
       "other",
     ];
-    const query = allowedFilters.includes(filter) ? { subject: filter } : {};
-
+    const query = allowedSubject.includes(subject) ? { subject } : {};
     const contacts = await Contact.find(query).sort({ createdAt: -1 });
     res
       .status(200)

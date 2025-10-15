@@ -172,6 +172,64 @@ const login = async (req, res) => {
     });
   }
 };
+const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email, role: "admin" });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "اطلاعات ورود نامعتبر است" });
+    }
+
+    if (user.accountLockedUntil && user.accountLockedUntil > Date.now()) {
+      return res.status(423).json({
+        success: false,
+        message: "حساب کاربری به دلیل تلاش‌های ناموفق موقتاً قفل شده است",
+      });
+    }
+
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      user.failedLoginAttempts += 1;
+
+      if (user.failedLoginAttempts >= 5) {
+        user.accountLockedUntil = Date.now() + 30 * 60 * 1000;
+      }
+      await user.save();
+      return res
+        .status(400)
+        .json({ success: false, message: "اطلاعات ورود نامعتبر است" });
+    }
+
+    generateAccessToken(res, user._id, user.role);
+    generateRefreshTokenAndSetCookie(res, user._id, user.role);
+    generateRefreshTokenAndSetCookie(res, user._id, user.role);
+
+    user.failedLoginAttempts = 0;
+    user.accountLockedUntil = null;
+    user.lastLogin = new Date();
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "ورود با موفقیت انجام شد",
+      user: {
+        ...user._doc,
+        password: undefined,
+        role: undefined,
+        verificationToken: undefined,
+        verificationTokenExpiresAt: undefined,
+        accountLockedUntil: undefined,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "خطای داخلی سرور",
+    });
+  }
+};
 
 const logout = async (req, res) => {
   res.clearCookie("refreshToken", {
@@ -326,4 +384,5 @@ export {
   refreshAccessToken,
   userInfo,
   checkAuth,
+  adminLogin,
 };
