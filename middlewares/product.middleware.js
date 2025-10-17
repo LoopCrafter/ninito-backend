@@ -20,6 +20,8 @@ const productValidations = [
     .withMessage("مقدار تخفیف نامعتبر است"),
   body("sizes").optional().isArray().withMessage("سایزها باید آرایه باشند"),
   body("colors").optional().isArray().withMessage("رنگ‌ها باید آرایه باشند"),
+  body("description").optional().isString().escape(),
+  body("shortDescription").optional().isString().escape(),
 ];
 
 export { productValidations };
