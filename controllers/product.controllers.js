@@ -15,7 +15,9 @@ const createNewProduct = async (req, res) => {
       basePrice,
       discount,
       description,
+      shortDescription,
       isFeatured,
+      specs,
     } = req.body;
 
     const thumbnail = req.files?.thumbnail
@@ -36,7 +38,7 @@ const createNewProduct = async (req, res) => {
         message: "باید یا variants یا basePrice مشخص شود",
       });
     }
-
+    console.log("specs", specs);
     const product = await Product.create({
       title,
       category,
@@ -44,9 +46,11 @@ const createNewProduct = async (req, res) => {
       basePrice: basePrice ? parseFloat(basePrice) : undefined,
       discount: parsedDiscount,
       description,
+      shortDescription,
       thumbnail,
       gallery,
       isFeatured: !!isFeatured,
+      specs: specs ? JSON.parse(specs) : [],
     });
     return res.status(201).json({ success: true, product });
   } catch (error) {
@@ -231,10 +235,12 @@ const updateProduct = async (req, res) => {
       basePrice,
       discount,
       description,
+      shortDescription,
       removeThumbnail,
       removeGallery,
       isFeatured,
       isEnabled,
+      specs,
     } = req.body;
     const parsedVariants = variants ? JSON.parse(variants) : undefined;
     const parsedDiscount = discount ? JSON.parse(discount) : undefined;
@@ -263,8 +269,10 @@ const updateProduct = async (req, res) => {
       basePrice: basePrice ? parseFloat(basePrice) : undefined,
       discount: parsedDiscount,
       description,
+      shortDescription,
       isFeatured: parseBoolean(isFeatured) && parseBoolean(isEnabled),
       isEnabled: parseBoolean(isEnabled),
+      specs: specs ? JSON.parse(specs) : undefined,
     };
 
     if (req.files?.thumbnail) {

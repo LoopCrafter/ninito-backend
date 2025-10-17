@@ -16,7 +16,12 @@ const ProductSchema = new Schema(
         sku: String,
       },
     ],
-
+    specs: [
+      {
+        key: String,
+        value: String,
+      },
+    ],
     basePrice: {
       type: Number,
       min: 0,
@@ -37,6 +42,7 @@ const ProductSchema = new Schema(
     },
 
     description: String,
+    shortDescription: String,
     thumbnail: String,
     gallery: [String],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
