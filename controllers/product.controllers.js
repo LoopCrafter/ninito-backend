@@ -143,8 +143,8 @@ const getAllProducts = async (req, res) => {
         .populate("category", "title image id")
         .populate({
           path: "comments",
-          select: "productId text userId",
-          populate: { path: "userId", select: "name email" },
+          select: "product text user",
+          populate: { path: "user", select: "name email" },
         }),
       Product.find({ isFeatured: true }),
       Product.countDocuments(conditions),
@@ -177,14 +177,21 @@ const getProductById = async (req, res) => {
     const product = await Product.findOne({ _id: productId })
       .populate({
         path: "comments",
-        match: { isConfirmed: true },
-        select: "productId text userId rating createdAt title",
-        populate: {
-          path: "userId",
-          select: "firstName lastName image email avatar _id",
-        },
+        // match: { isConfirmed: true },
+        select: "product text user rating createdAt title",
+        populate: [
+          {
+            path: "user",
+            select: "firstName lastName image email avatar _id",
+          },
+          {
+            path: "product",
+            select: "title thumbnail",
+          },
+        ],
       })
       .populate("category", "title image id");
+
     if (!product) {
       return res
         .status(404)
@@ -195,12 +202,12 @@ const getProductById = async (req, res) => {
     if (productObj.comments.length > 0) {
       productObj.comments = productObj.comments.map((comment) => ({
         id: comment.id.toString(),
-        productId: comment.productId.toString(),
+        productId: comment.product.toString(),
         user: {
-          email: comment.userId.email,
-          firstName: comment.userId.firstName,
-          lastName: comment.userId.lastName,
-          avatar: comment.userId.avatar,
+          email: comment.user.email,
+          firstName: comment.user.firstName,
+          lastName: comment.user.lastName,
+          avatar: comment.user.avatar,
         },
         title: comment.title,
         text: comment.text,
@@ -210,6 +217,7 @@ const getProductById = async (req, res) => {
     }
     return res.json({ success: true, product: productObj });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ success: false, error: error.message });
   }
 };

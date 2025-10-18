@@ -2,12 +2,12 @@ import { model, Schema } from "mongoose";
 
 const CommentSchema = new Schema(
   {
-    productId: {
+    product: {
       type: Schema.Types.ObjectId,
       ref: "Product",
       required: true,
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

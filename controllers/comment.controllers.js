@@ -39,6 +39,19 @@ const createComment = async (req, res) => {
 const deleteComment = (req, res) => {
   res.json({ message: "Comment deleted" });
 };
+
+const getAllComments = async (req, res) => {
+  try {
+    const comments = await Comment.find()
+      .populate("user", "firstName lastName avatar")
+      .populate("product", "title");
+    res.json({ success: true, comments });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: error.message || "Server error" });
+  }
+};
 const getComments = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -99,4 +112,10 @@ const updateComment = (req, res) => {
   res.json({ message: "Comment updated" });
 };
 
-export { createComment, deleteComment, getComments, updateComment };
+export {
+  createComment,
+  deleteComment,
+  getComments,
+  updateComment,
+  getAllComments,
+};
