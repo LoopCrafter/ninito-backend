@@ -2,13 +2,21 @@ import { Comment } from "../models/comment.model.js";
 import { Product } from "../models/product.model.js";
 
 const createComment = async (req, res) => {
-  const { productId, userId, text, commentId } = req.body;
+  const { productId } = req.params;
+  const { text, commentId, rating, title } = req.body;
+  const userId = req.userId;
   try {
     if (commentId) {
       // Logic to reply to an existing comment
       return res.json({ message: `Reply to comment ${commentId} created` });
     } else {
-      const comment = await Comment.create({ productId, userId, text });
+      const comment = await Comment.create({
+        productId,
+        userId,
+        text,
+        rating,
+        title,
+      });
       const product = await Product.findById(productId);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -20,13 +28,12 @@ const createComment = async (req, res) => {
       return res.json({
         message: "New comment created",
         success: true,
-        comment,
-        productComments: product.comments,
       });
     }
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error" });
   }
 };
 const deleteComment = (req, res) => {
@@ -83,8 +90,9 @@ const getComments = async (req, res) => {
       reviews,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(500)
+      .json({ success: false, message: error.message || "Server error" });
   }
 };
 const updateComment = (req, res) => {

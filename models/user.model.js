@@ -64,7 +64,7 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.virtual("userImage").get(function () {
+userSchema.virtual("avatar").get(function () {
   if (!this.image) return null;
   const baseUrl = process.env.BASEURL || "http://localhost:3000";
   return `${baseUrl}${this.image.startsWith("/") ? "" : "/"}${this.image}`;

@@ -38,7 +38,6 @@ const createNewProduct = async (req, res) => {
         message: "باید یا variants یا basePrice مشخص شود",
       });
     }
-    console.log("specs", specs);
     const product = await Product.create({
       title,
       category,
@@ -173,35 +172,41 @@ const getAllProducts = async (req, res) => {
 };
 const getProductById = async (req, res) => {
   const { productId } = req.params;
+
   try {
     const product = await Product.findOne({ _id: productId })
       .populate({
         path: "comments",
-        select: "productId text userId",
-        populate: { path: "userId", select: "name email" },
+        select: "productId text userId rating createdAt title",
+        populate: {
+          path: "userId",
+          select: "firstName lastName image email avatar _id",
+        },
       })
       .populate("category", "title image id");
-
     if (!product) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
     }
 
-    let productObj = product.toObject();
+    const productObj = product.toObject({ virtuals: true });
     if (productObj.comments.length > 0) {
       productObj.comments = productObj.comments.map((comment) => ({
-        id: comment._id.toString(),
+        id: comment.id.toString(),
         productId: comment.productId.toString(),
         user: {
-          id: comment.userId._id.toString(),
-          name: comment.userId.name,
           email: comment.userId.email,
+          firstName: comment.userId.firstName,
+          lastName: comment.userId.lastName,
+          avatar: comment.userId.avatar,
         },
+        title: comment.title,
         text: comment.text,
+        rating: comment.rating,
+        createdAt: comment.createdAt,
       }));
     }
-
     return res.json({ success: true, product: productObj });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });

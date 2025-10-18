@@ -10,6 +10,8 @@ import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 import uploaderManager from "./../utils/FileUploaderManager.js";
 import { productValidations } from "../middlewares/product.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
+import { body } from "express-validator";
+import { createComment } from "../controllers/comment.controllers.js";
 
 const router = Router();
 const uploadPath = "./uploads/products";
@@ -44,6 +46,22 @@ router.patch(
   authorizeRoles("admin"),
   uploadMiddleware,
   updateProduct
+);
+
+router.post(
+  "/:productId/reviews",
+  requireAuth,
+  authorizeRoles("admin", "user"),
+  [
+    body("rating")
+      .notEmpty()
+      .withMessage("rating is required")
+      .isInt({ min: 1, max: 5 })
+      .withMessage("rating must be between 1 and 5"),
+    body("text").notEmpty().withMessage("comment is required"),
+  ],
+  validate,
+  createComment
 );
 
 export default router;
