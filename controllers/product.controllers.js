@@ -177,6 +177,7 @@ const getProductById = async (req, res) => {
     const product = await Product.findOne({ _id: productId })
       .populate({
         path: "comments",
+        match: { isConfirmed: true },
         select: "productId text userId rating createdAt title",
         populate: {
           path: "userId",
