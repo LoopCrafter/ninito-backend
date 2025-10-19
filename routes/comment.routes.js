@@ -8,10 +8,15 @@ import {
   getComments,
   updateComment,
 } from "../controllers/comment.controllers.js";
-import { body } from "express-validator";
+import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
 router.get("/", getAllComments);
-router.get("/:productId", getComments);
+router.get(
+  "/product/:productId",
+  requireAuth,
+  authorizeRoles("admin"),
+  getComments
+);
 router.patch("/:commentId", updateComment);
 router.delete("/:commentId", deleteComment);
 

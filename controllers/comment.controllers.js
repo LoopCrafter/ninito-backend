@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { Product } from "../models/product.model.js";
 
@@ -11,8 +12,8 @@ const createComment = async (req, res) => {
       return res.json({ message: `Reply to comment ${commentId} created` });
     } else {
       const comment = await Comment.create({
-        productId,
-        userId,
+        product: productId,
+        user: userId,
         text,
         rating,
         title,
@@ -88,7 +89,7 @@ const getComments = async (req, res) => {
         : {};
 
     const reviews = await Comment.find({ product: productId })
-      .populate("user", "name")
+      .populate("user", "firstName lastName image avatar")
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(Number(limit));
