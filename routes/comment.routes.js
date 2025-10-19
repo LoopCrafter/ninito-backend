@@ -7,6 +7,7 @@ import {
   getAllComments,
   getComments,
   updateComment,
+  updateConfirmation,
 } from "../controllers/comment.controllers.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
@@ -19,5 +20,5 @@ router.get(
 );
 router.patch("/:commentId", updateComment);
 router.delete("/:commentId", deleteComment);
-
+router.patch("/:commentId/confirm", updateConfirmation);
 export default router;

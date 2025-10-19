@@ -113,10 +113,38 @@ const updateComment = (req, res) => {
   res.json({ message: "Comment updated" });
 };
 
+const updateConfirmation = async (req, res) => {
+  const { commentId } = req.params;
+  const { confirmed } = req.body;
+
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      commentId,
+      { isConfirmed: confirmed },
+      { new: true }
+    ).populate("user", "firstName lastName image avatar");
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    return res.json({
+      message: "Comment confirmation status updated",
+      success: true,
+      comment,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error" });
+  }
+};
+
 export {
   createComment,
   deleteComment,
   getComments,
   updateComment,
   getAllComments,
+  updateConfirmation,
 };

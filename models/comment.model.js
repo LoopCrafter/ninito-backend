@@ -53,4 +53,24 @@ const CommentSchema = new Schema(
 
 CommentSchema.index({ product: 1, user: 1 }, { unique: true });
 
+CommentSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    return ret;
+  },
+});
+
+CommentSchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+    return ret;
+  },
+});
+
 export const Comment = model("Comment", CommentSchema);
